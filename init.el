@@ -51,7 +51,7 @@
 
 (require 'init-frame-hooks)
 ;;(require 'init-xterm)
-;;(require 'init-themes)
+(require 'init-themes)
 ;;(require 'init-osx-keys)
 (require 'init-gui-frames)
 (require 'init-dired)
@@ -67,7 +67,7 @@
 ;;(require 'init-helm)
 (require 'init-hippie-expand)
 (require 'init-company)
-;;(require 'init-windows)
+(require 'init-windows)
 (require 'init-sessions)
 (require 'init-mmm)
 
@@ -123,7 +123,7 @@
 (require 'init-misc)
 
 (require 'init-folding)
-(require 'init-dash)
+;;(require 'init-dash)
 
 ;;(require 'init-twitter)
 ;; (require 'init-mu)
