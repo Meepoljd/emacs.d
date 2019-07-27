@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Size Parameters</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Size-Parameters"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Layout-Parameters.html#Layout-Parameters">Layout Parameters</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Position-Parameters.html#Position-Parameters">Position Parameters</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Window-Frame-Parameters.html#Window-Frame-Parameters">Window Frame Parameters</a>
+
+</div>
+
+<h5 class="subsubsection">29.4.3.3 Size Parameters</h5>
+
+<p><a name="index-window-size-on-display-3055"></a>
+Frame parameters usually specify frame sizes in character units.  On
+graphical displays, the <code>default</code> face determines the actual pixel
+sizes of these character units (see <a href="Face-Attributes.html#Face-Attributes">Face Attributes</a>).
+
+     
+<a name="index-width_0040r_007b_002c-a-frame-parameter_007d-3056"></a>
+<dl><dt><code>width</code><dd>This parameter specifies the width of the frame.  It can be specified as
+in the following ways:
+
+          <dl>
+<dt>an integer<dd>A positive integer specifies the width of the frame's text area
+(see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>) in characters.
+
+          <br><dt>a cons cell<dd>If this is a cons cell with the symbol <code>text-pixels</code> in its
+<span class="sc">car</span>, the <span class="sc">cdr</span> of that cell specifies the width of the frame's
+text area in pixels.
+
+          <p><a name="index-frame-width-ratio-3057"></a><a name="index-frame-height-ratio-3058"></a><br><dt>a floating-point value<dd>A floating-point number between 0.0 and 1.0 can be used to specify the
+width of a frame via its <dfn>width ratio</dfn>&mdash;the ratio of its outer
+width (see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>) to the width of the frame's workarea
+(see <a href="Multiple-Terminals.html#Multiple-Terminals">Multiple Terminals</a>) or its parent frame's (see <a href="Child-Frames.html#Child-Frames">Child Frames</a>) native frame.  Thus, a value of 0.5 makes the frame occupy half
+of the width of its workarea or parent frame, a value of 1.0 the full
+width.  Similarly, the <dfn>height ratio</dfn> of a frame is the ratio of its
+outer height to the height of its workarea or its parent's native frame.
+
+          <p>Emacs will try to keep the width and height ratio of a child frame
+unaltered if that frame has a non-<code>nil</code> <code>keep-ratio</code> parameter
+(see <a href="Frame-Interaction-Parameters.html#Frame-Interaction-Parameters">Frame Interaction Parameters</a>) and its parent frame is resized.
+
+          <p>Since the outer size of a frame is usually unavailable before a frame
+has been made visible, it is generally not advisable to use
+floating-point values when creating decorated frames.  Floating-point
+values are more suited to ensure that a child frame always fits within
+the area of its parent frame as, for example, when customizing
+<code>display-buffer-alist</code> (see <a href="Choosing-Window.html#Choosing-Window">Choosing Window</a>) via
+<code>display-buffer-in-child-frame</code>. 
+</dl>
+
+     <p>Regardless of how this parameter was specified, functions reporting the
+value of this parameter like <code>frame-parameters</code> always report the
+width of the frame's text area in characters as an integer rounded, if
+necessary, to a multiple of the frame's default character width.  That
+value is also used by the desktop saving routines.
+
+     <p><a name="index-height_0040r_007b_002c-a-frame-parameter_007d-3059"></a><br><dt><code>height</code><dd>This parameter specifies the height of the frame.  It works just like
+<code>width</code>, except vertically instead of horizontally.
+
+     <p><a name="index-user_002dsize_0040r_007b_002c-a-frame-parameter_007d-3060"></a><br><dt><code>user-size</code><dd>This does for the size parameters <code>height</code> and <code>width</code> what
+the <code>user-position</code> parameter (see <a href="Position-Parameters.html#Position-Parameters">user-position</a>) does for the position parameters <code>top</code> and
+<code>left</code>.
+
+     <p><a name="index-min_002dwidth_0040r_007b_002c-a-frame-parameter_007d-3061"></a><br><dt><code>min-width</code><dd>This parameter specifies the minimum native width (see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>) of the frame, in characters.  Normally, the functions that
+establish a frame's initial width or resize a frame horizontally make
+sure that all the frame's windows, vertical scroll bars, fringes,
+margins and vertical dividers can be displayed.  This parameter, if
+non-<code>nil</code> allows to make a frame narrower than that with the
+consequence that any components that do not fit will be clipped by the
+window manager.
+
+     <p><a name="index-min_002dheight_0040r_007b_002c-a-frame-parameter_007d-3062"></a><br><dt><code>min-height</code><dd>This parameter specifies the minimum native height (see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>) of the frame, in characters.  Normally, the functions that
+establish a frame's initial size or resize a frame make sure that all
+the frame's windows, horizontal scroll bars and dividers, mode and
+header lines, the echo area and the internal menu and tool bar can be
+displayed.  This parameter, if non-<code>nil</code> allows to make a frame
+smaller than that with the consequence that any components that do not
+fit will be clipped by the window manager.
+
+     <p><a name="index-fullboth-frames-3063"></a><a name="index-fullheight-frames-3064"></a><a name="index-fullwidth-frames-3065"></a><a name="index-maximized-frames-3066"></a><a name="index-fullscreen_0040r_007b_002c-a-frame-parameter_007d-3067"></a><br><dt><code>fullscreen</code><dd>This parameter specifies whether to maximize the frame's width, height
+or both.  Its value can be <code>fullwidth</code>, <code>fullheight</code>,
+<code>fullboth</code>, or <code>maximized</code>.  A <dfn>fullwidth</dfn> frame is as
+wide as possible, a <dfn>fullheight</dfn> frame is as tall as possible, and
+a <dfn>fullboth</dfn> frame is both as wide and as tall as possible.  A
+<dfn>maximized</dfn> frame is like a &ldquo;fullboth&rdquo; frame, except that it usually
+keeps its title bar and the buttons for resizing
+and closing the frame.  Also, maximized frames typically avoid hiding
+any task bar or panels displayed on the desktop.  A &ldquo;fullboth&rdquo; frame,
+on the other hand, usually omits the title bar and occupies the entire
+available screen space.
+
+     <p>Full-height and full-width frames are more similar to maximized
+frames in this regard.  However, these typically display an external
+border which might be absent with maximized frames.  Hence the heights
+of maximized and full-height frames and the widths of maximized and
+full-width frames often differ by a few pixels.
+
+     <p>With some window managers you may have to customize the variable
+<code>frame-resize-pixelwise</code> (see <a href="Frame-Size.html#Frame-Size">Frame Size</a>) in order to make a
+frame truly appear maximized or full-screen.  Moreover, some window
+managers might not support smooth transition between the various
+full-screen or maximization states.  Customizing the variable
+<code>x-frame-normalize-before-maximize</code> can help to overcome that.
+
+     <p>Full-screen on macOS hides both the tool-bar and the menu-bar, however
+both will be displayed if the mouse pointer is moved to the top of the
+screen.
+
+     <p><a name="index-fullscreen_002drestore_0040r_007b_002c-a-frame-parameter_007d-3068"></a><br><dt><code>fullscreen-restore</code><dd>This parameter specifies the desired fullscreen state of the frame
+after invoking the <code>toggle-frame-fullscreen</code> command (see <a href="../emacs/Frame-Commands.html#Frame-Commands">Frame Commands</a>) in the &ldquo;fullboth&rdquo; state. 
+Normally this parameter is installed automatically by that command when
+toggling the state to fullboth.  If, however, you start Emacs in the
+&ldquo;fullboth&rdquo; state, you have to specify the desired behavior in your initial
+file as, for example
+
+     <pre class="example">          (setq default-frame-alist
+              '((fullscreen . fullboth)
+                (fullscreen-restore . fullheight)))
+</pre>
+     <p>This will give a new frame full height after typing in it &lt;F11&gt; for
+the first time.
+
+     <p><a name="index-fit_002dframe_002dto_002dbuffer_002dmargins_0040r_007b_002c-a-frame-parameter_007d-3069"></a><br><dt><code>fit-frame-to-buffer-margins</code><dd>This parameter allows to override the value of the option
+<code>fit-frame-to-buffer-margins</code> when fitting this frame to the buffer
+of its root window with <code>fit-frame-to-buffer</code> (see <a href="Resizing-Windows.html#Resizing-Windows">Resizing Windows</a>).
+
+     <p><a name="index-fit_002dframe_002dto_002dbuffer_002dsizes_0040r_007b_002c-a-frame-parameter_007d-3070"></a><br><dt><code>fit-frame-to-buffer-sizes</code><dd>This parameter allows to override the value of the option
+<code>fit-frame-to-buffer-sizes</code> when fitting this frame to the buffer
+of its root window with <code>fit-frame-to-buffer</code> (see <a href="Resizing-Windows.html#Resizing-Windows">Resizing Windows</a>). 
+</dl>
+
+   </body></html>
+

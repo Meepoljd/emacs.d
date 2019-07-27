@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Profiling</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Profiling"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Test-Coverage.html#Test-Coverage">Test Coverage</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Debugging.html#Debugging">Debugging</a>
+
+</div>
+
+<h3 class="section">18.5 Profiling</h3>
+
+<p><a name="index-profiling-1327"></a><a name="index-profile-1328"></a><a name="index-performance-analysis-1329"></a><a name="index-measuring-resource-usage-1330"></a><a name="index-memory-usage-1331"></a>
+If your program is working correctly, but not fast enough, and you
+want to make it run more quickly or efficiently, the first thing to do
+is <dfn>profile</dfn> your code so that you know where it spends most of
+the execution time.  If you find that one particular function is
+responsible for a significant portion of the execution time, you can
+start looking for ways to optimize that piece.
+
+   <p>Emacs has built-in support for this.  To begin profiling, type
+<kbd>M-x profiler-start</kbd>.  You can choose to profile by processor
+usage, memory usage, or both.  Then run the code you'd like to speed
+up.  After that, type <kbd>M-x profiler-report</kbd> to display a summary
+buffer for each resource (cpu and memory) that you chose to profile. 
+The names of the report buffers include the times at which the reports
+were generated, so you can generate another report later on without
+erasing previous results.  When you have finished profiling, type
+<kbd>M-x profiler-stop</kbd> (there is a small overhead associated with
+profiling, so we don't recommend leaving it active except when you are
+actually running the code you want to examine).
+
+   <p>The profiler report buffer shows, on each line, a function that was
+called, followed by how much resources (cpu or memory) it used in
+absolute and percentage terms since profiling started.  If a given
+line has a &lsquo;<samp><span class="samp">+</span></samp>&rsquo; symbol at the left-hand side, you can expand that
+line by typing <kbd>&lt;RET&gt;</kbd>, in order to see the function(s) called
+by the higher-level function.  Use a prefix argument (<kbd>C-u
+&lt;RET&gt;</kbd>) to see the whole call tree below a function.  Pressing
+<kbd>&lt;RET&gt;</kbd> again will collapse back to the original state.
+
+   <p>Press <kbd>j</kbd> or <kbd>mouse-2</kbd> to jump to the definition of a function
+at point.  Press <kbd>d</kbd> to view a function's documentation.  You can
+save a profile to a file using <kbd>C-x C-w</kbd>.  You can compare two
+profiles using <kbd>=</kbd>.
+
+<!-- FIXME reversed calltree? -->
+   <p><a name="index-g_t_0040file_007belp_002eel_007d-1332"></a><a name="index-timing-programs-1333"></a>The <samp><span class="file">elp</span></samp> library offers an alternative approach, which is useful
+when you know in advance which Lisp function(s) you want to profile. 
+Using that library, you begin by setting <code>elp-function-list</code> to
+the list of function symbols&mdash;those are the functions you want to
+profile.  Then type <kbd>M-x&nbsp;elp-instrument-list&nbsp;&lt;RET&gt;&nbsp;nil&nbsp;&lt;RET&gt;</kbd><!-- /@w --> to arrange for profiling those functions.  After running
+the code you want to profile, invoke <kbd>M-x&nbsp;elp-results</kbd><!-- /@w --> to
+display the current results.  See the file <samp><span class="file">elp.el</span></samp> for more
+detailed instructions.  This approach is limited to profiling
+functions written in Lisp, it cannot profile Emacs primitives.
+
+   <p><a name="index-g_t_0040file_007bbenchmark_002eel_007d-1334"></a><a name="index-benchmarking-1335"></a>You can measure the time it takes to evaluate individual Emacs Lisp
+forms using the <samp><span class="file">benchmark</span></samp> library.  See the macros
+<code>benchmark-run</code> and <code>benchmark-run-compiled</code> in
+<samp><span class="file">benchmark.el</span></samp>.  You can also use the <code>benchmark</code> command
+for timing forms interactively.
+
+<!-- Not worth putting in the printed manual. -->
+   <p><a name="index-g_t_002d_002denable_002dprofiling-option-of-configure-1336"></a>To profile Emacs at the level of its C code, you can build it using the
+<samp><span class="option">--enable-profiling</span></samp> option of <samp><span class="command">configure</span></samp>.  When Emacs
+exits, it generates a file <samp><span class="file">gmon.out</span></samp> that you can examine using
+the <samp><span class="command">gprof</span></samp> utility.  This feature is mainly useful for
+debugging Emacs.  It actually stops the Lisp-level <kbd>M-x
+profiler-...</kbd> commands described above from working. 
+<!-- *-texinfo-*- -->
+<!-- This is part of the GNU Emacs Lisp Reference Manual. -->
+<!-- Copyright (C) 1990-1994, 1998-1999, 2001-2018 Free Software -->
+<!-- Foundation, Inc. -->
+<!-- See the file elisp.texi for copying conditions. -->
+
+   </body></html>
+

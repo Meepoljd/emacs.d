@@ -1,0 +1,352 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Low-Level Font</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Low-Level-Font"></a>
+<a name="Low_002dLevel-Font"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Fontsets.html#Fontsets">Fontsets</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Faces.html#Faces">Faces</a>
+
+</p></div>
+
+<h4 class="subsection">39.12.12 Low-Level Font Representation</h4>
+
+<p><a name="index-font-property-4656"></a>
+  Normally, it is not necessary to manipulate fonts directly.  In case
+you need to do so, this section explains how.
+
+   </p><p>In Emacs Lisp, fonts are represented using three different Lisp
+object types: <dfn>font objects</dfn>, <dfn>font specs</dfn>, and <dfn>font
+entities</dfn>.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/fontp"></a><b>fontp</b><var> object &amp;optional type<a name="index-fontp-4657"></a></var><br>
+<blockquote><p>Return <code>t</code> if <var>object</var> is a font object, font spec, or font
+entity.  Otherwise, return <code>nil</code>.
+
+        </p><p>The optional argument <var>type</var>, if non-<code>nil</code>, determines the
+exact type of Lisp object to check for.  In that case, <var>type</var>
+should be one of <code>font-object</code>, <code>font-spec</code>, or
+<code>font-entity</code>. 
+</p></blockquote></div>
+
+   <p><a name="index-font-object-4658"></a>  A font object is a Lisp object that represents a font that Emacs has
+<dfn>opened</dfn>.  Font objects cannot be modified in Lisp, but they can
+be inspected.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/font%2Dat"></a><b>font-at</b><var> position &amp;optional window string<a name="index-font_002dat-4659"></a></var><br>
+<blockquote><p>Return the font object that is being used to display the character at
+position <var>position</var> in the window <var>window</var>.  If <var>window</var>
+is <code>nil</code>, it defaults to the selected window.  If <var>string</var> is
+<code>nil</code>, <var>position</var> specifies a position in the current buffer;
+otherwise, <var>string</var> should be a string, and <var>position</var>
+specifies a position in that string. 
+</p></blockquote></div>
+
+   <p><a name="index-font-spec-4660"></a>  A font spec is a Lisp object that contains a set of specifications
+that can be used to find a font.  More than one font may match the
+specifications in a font spec.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/font%2Dspec"></a><b>font-spec</b><var> &amp;rest arguments<a name="index-font_002dspec-4661"></a></var><br>
+<blockquote><p>Return a new font spec using the specifications in <var>arguments</var>,
+which should come in <code>property</code>-<code>value</code> pairs.  The possible
+specifications are as follows:
+
+          </p><dl>
+<dt><code>:name</code></dt><dd>The font name (a string), in either XLFD, Fontconfig, or GTK+ format. 
+See <a href="../emacs/Fonts.html#Fonts">Fonts</a>.
+
+          <br></dd><dt><code>:family</code></dt><dt><code>:foundry</code></dt><dt><code>:weight</code></dt><dt><code>:slant</code></dt><dt><code>:width</code></dt><dd>These have the same meanings as the face attributes of the same name. 
+See <a href="Face-Attributes.html#Face-Attributes">Face Attributes</a>.
+
+          <br></dd><dt><code>:size</code></dt><dd>The font size—either a non-negative integer that specifies the pixel
+size, or a floating-point number that specifies the point size.
+
+          <br></dd><dt><code>:adstyle</code></dt><dd>Additional typographic style information for the font, such as
+‘<samp><span class="samp">sans</span></samp>’.  The value should be a string or a symbol.
+
+          <p><a name="index-font-registry-4662"></a><br></p></dd><dt><code>:registry</code></dt><dd>The charset registry and encoding of the font, such as
+‘<samp><span class="samp">iso8859-1</span></samp>’.  The value should be a string or a symbol.
+
+          <br></dd><dt><code>:script</code></dt><dd>The script that the font must support (a symbol).
+
+          <br></dd><dt><code>:lang</code></dt><dd>The language that the font should support.  The value should be a
+symbol whose name is a two-letter ISO-639 language name.  On X, the
+value is matched against the “Additional Style” field of the XLFD
+name of a font, if it is non-empty.  On MS-Windows, fonts matching the
+spec are required to support codepages needed for the language. 
+Currently, only a small set of CJK languages is supported with this
+property: ‘<samp><span class="samp">ja</span></samp>’, ‘<samp><span class="samp">ko</span></samp>’, and ‘<samp><span class="samp">zh</span></samp>’.
+
+          <br></dd><dt><code>:otf</code></dt><dd><a name="index-OpenType-font-4663"></a>The font must be an OpenType font that supports these OpenType
+features, provided Emacs is compiled with a library, such as
+‘<samp><span class="samp">libotf</span></samp>’ on GNU/Linux, that supports complex text layout for
+scripts which need that.  The value must be a list of the form
+
+          <pre class="smallexample">               <code>(</code><var>script-tag</var> <var>langsys-tag</var> <var>gsub</var> <var>gpos</var><code>)</code>
+</pre>
+          <p>where <var>script-tag</var> is the OpenType script tag symbol;
+<var>langsys-tag</var> is the OpenType language system tag symbol, or
+<code>nil</code> to use the default language system; <code>gsub</code> is a list
+of OpenType GSUB feature tag symbols, or <code>nil</code> if none is
+required; and <code>gpos</code> is a list of OpenType GPOS feature tag
+symbols, or <code>nil</code> if none is required.  If <code>gsub</code> or
+<code>gpos</code> is a list, a <code>nil</code> element in that list means that
+the font must not match any of the remaining tag symbols.  The
+<code>gpos</code> element may be omitted. 
+</p></dd></dl>
+        <p></p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/font%2Dput"></a><b>font-put</b><var> font-spec property value<a name="index-font_002dput-4664"></a></var><br>
+<blockquote><p>Set the font property <var>property</var> in the font-spec <var>font-spec</var>
+to <var>value</var>. 
+</p></blockquote></div>
+
+   <p><a name="index-font-entity-4665"></a>  A font entity is a reference to a font that need not be open.  Its
+properties are intermediate between a font object and a font spec:
+like a font object, and unlike a font spec, it refers to a single,
+specific font.  Unlike a font object, creating a font entity does not
+load the contents of that font into computer memory.  Emacs may open
+multiple font objects of different sizes from a single font entity
+referring to a scalable font.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/find%2Dfont"></a><b>find-font</b><var> font-spec &amp;optional frame<a name="index-find_002dfont-4666"></a></var><br>
+<blockquote><p>This function returns a font entity that best matches the font spec
+<var>font-spec</var> on frame <var>frame</var>.  If <var>frame</var> is <code>nil</code>,
+it defaults to the selected frame. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/list%2Dfonts"></a><b>list-fonts</b><var> font-spec &amp;optional frame num prefer<a name="index-list_002dfonts-4667"></a></var><br>
+<blockquote><p>This function returns a list of all font entities that match the font
+spec <var>font-spec</var>.
+
+        </p><p>The optional argument <var>frame</var>, if non-<code>nil</code>, specifies the
+frame on which the fonts are to be displayed.  The optional argument
+<var>num</var>, if non-<code>nil</code>, should be an integer that specifies the
+maximum length of the returned list.  The optional argument
+<var>prefer</var>, if non-<code>nil</code>, should be another font spec, which is
+used to control the order of the returned list; the returned font
+entities are sorted in order of decreasing closeness to that font
+spec. 
+</p></blockquote></div>
+
+   <p>If you call <code>set-face-attribute</code> and pass a font spec, font
+entity, or font name string as the value of the <code>:font</code>
+attribute, Emacs opens the best matching font that is available
+for display.  It then stores the corresponding font object as the
+actual value of the <code>:font</code> attribute for that face.
+
+   </p><p>The following functions can be used to obtain information about a
+font.  For these functions, the <var>font</var> argument can be a font
+object, a font entity, or a font spec.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/font%2Dget"></a><b>font-get</b><var> font property<a name="index-font_002dget-4668"></a></var><br>
+<blockquote><p>This function returns the value of the font property <var>property</var>
+for <var>font</var>.
+
+        </p><p>If <var>font</var> is a font spec and the font spec does not specify
+<var>property</var>, the return value is <code>nil</code>.  If <var>font</var> is a
+font object or font entity, the value for the <var>:script</var> property
+may be a list of scripts supported by the font. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/font%2Dface%2Dattributes"></a><b>font-face-attributes</b><var> font &amp;optional frame<a name="index-font_002dface_002dattributes-4669"></a></var><br>
+<blockquote><p>This function returns a list of face attributes corresponding to
+<var>font</var>.  The optional argument <var>frame</var> specifies the frame on
+which the font is to be displayed.  If it is <code>nil</code>, the selected
+frame is used.  The return value has the form
+
+     </p><pre class="smallexample">          (:family <var>family</var> :height <var>height</var> :weight <var>weight</var>
+             :slant <var>slant</var> :width <var>width</var>)
+</pre>
+        <p>where the values of <var>family</var>, <var>height</var>, <var>weight</var>,
+<var>slant</var>, and <var>width</var> are face attribute values.  Some of these
+key-attribute pairs may be omitted from the list if they are not
+specified by <var>font</var>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/font%2Dxlfd%2Dname"></a><b>font-xlfd-name</b><var> font &amp;optional fold-wildcards<a name="index-font_002dxlfd_002dname-4670"></a></var><br>
+<blockquote><p>This function returns the XLFD (X Logical Font Descriptor), a string,
+matching <var>font</var>.  See <a href="../emacs/Fonts.html#Fonts">Fonts</a>, for
+information about XLFDs.  If the name is too long for an XLFD (which
+can contain at most 255 characters), the function returns <code>nil</code>.
+
+        </p><p>If the optional argument <var>fold-wildcards</var> is non-<code>nil</code>,
+consecutive wildcards in the XLFD are folded into one. 
+</p></blockquote></div>
+
+   <p>The following two functions return important information about a font.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/font%2Dinfo"></a><b>font-info</b><var> name &amp;optional frame<a name="index-font_002dinfo-4671"></a></var><br>
+<blockquote><p>This function returns information about a font specified by its
+<var>name</var>, a string, as it is used on <var>frame</var>.  If <var>frame</var> is
+omitted or <code>nil</code>, it defaults to the selected frame.
+
+        </p><p>The value returned by the function is a vector of the form
+<code>[</code><var>opened-name</var> <var>full-name</var> <var>size</var> <var>height</var>
+<var>baseline-offset</var> <var>relative-compose</var> <var>default-ascent</var>
+<var>max-width</var> <var>ascent</var> <var>descent</var> <var>space-width</var>
+<var>average-width</var> <var>filename</var> <var>capability</var><code>]</code>.  Here's the
+description of each components of this vector:
+
+          </p><dl>
+<dt><var>opened-name</var></dt><dd>The name used to open the font, a string.
+
+          <br></dd><dt><var>full-name</var></dt><dd>The full name of the font, a string.
+
+          <br></dd><dt><var>size</var></dt><dd>The pixel size of the font.
+
+          <br></dd><dt><var>height</var></dt><dd>The height of the font in pixels.
+
+          <br></dd><dt><var>baseline-offset</var></dt><dd>The offset in pixels from the <acronym>ASCII</acronym> baseline, positive
+upward.
+
+          <br></dd><dt><var>relative-compose</var></dt><dt><var>default-ascent</var></dt><dd>Numbers controlling how to compose characters.
+
+          <br></dd><dt><var>ascent</var></dt><dt><var>descent</var></dt><dd>The ascent and descent of this font.  The sum of these two numbers
+should be equal to the value of <var>height</var> above.
+
+          <br></dd><dt><var>space-width</var></dt><dd>The width, in pixels, of the font's space character.
+
+          <br></dd><dt><var>average-width</var></dt><dd>The average width of the font characters.  If this is zero, Emacs uses
+the value of <var>space-width</var> instead, when it calculates text layout
+on display.
+
+          <br></dd><dt><var>filename</var></dt><dd>The file name of the font as a string.  This can be <code>nil</code> if the
+font back-end does not provide a way to find out the font's file name.
+
+          <br></dd><dt><var>capability</var></dt><dd>A list whose first element is a symbol representing the font type, one
+of <code>x</code>, <code>opentype</code>, <code>truetype</code>, <code>type1</code>,
+<code>pcf</code>, or <code>bdf</code>.  For OpenType fonts, the list includes 2
+additional elements describing the <span class="sc">gsub</span> and <span class="sc">gpos</span> features
+supported by the font.  Each of these elements is a list of the form
+<code>((</code><var>script</var><code> (</code><var>langsys</var> <var>feature</var><code> ...) ...) 
+...)</code>, where <var>script</var> is a symbol representing an OpenType
+script tag, <var>langsys</var> is a symbol representing an OpenType langsys
+tag (or <code>nil</code>, which stands for the default langsys), and each
+<var>feature</var> is a symbol representing an OpenType feature tag. 
+</dd></dl>
+        <p></p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/query%2Dfont"></a><b>query-font</b><var> font-object<a name="index-query_002dfont-4672"></a></var><br>
+<blockquote><p>This function returns information about a <var>font-object</var>.  (This is
+in contrast to <code>font-info</code>, which takes the font name, a string,
+as its argument.)
+
+        </p><p>The value returned by the function is a vector of the form
+<code>[</code><var>name</var> <var>filename</var> <var>pixel-size</var> <var>max-width</var>
+<var>ascent</var> <var>descent</var> <var>space-width</var> <var>average-width</var>
+<var>capability</var><code>]</code>.  Here's the description of each components of this
+vector:
+
+          </p><dl>
+<dt><var>name</var></dt><dd>The font name, a string.
+
+          <br></dd><dt><var>filename</var></dt><dd>The file name of the font as a string.  This can be <code>nil</code> if the
+font back-end does not provide a way to find out the font's file name.
+
+          <br></dd><dt><var>pixel-size</var></dt><dd>The pixel size of the font used to open the font.
+
+          <br></dd><dt><var>max-width</var></dt><dd>The maximum advance width of the font.
+
+          <br></dd><dt><var>ascent</var></dt><dt><var>descent</var></dt><dd>The ascent and descent of this font.  The sum of these two numbers
+gives the font height.
+
+          <br></dd><dt><var>space-width</var></dt><dd>The width, in pixels, of the font's space character.
+
+          <br></dd><dt><var>average-width</var></dt><dd>The average width of the font characters.  If this is zero, Emacs uses
+the value of <var>space-width</var> instead, when it calculates text layout
+on display.
+
+          <br></dd><dt><var>capability</var></dt><dd>A list whose first element is a symbol representing the font type, one
+of <code>x</code>, <code>opentype</code>, <code>truetype</code>, <code>type1</code>,
+<code>pcf</code>, or <code>bdf</code>.  For OpenType fonts, the list includes 2
+additional elements describing the <span class="sc">gsub</span> and <span class="sc">gpos</span> features
+supported by the font.  Each of these elements is a list of the form
+<code>((</code><var>script</var><code> (</code><var>langsys</var> <var>feature</var><code> ...) ...) 
+...)</code>, where <var>script</var> is a symbol representing an OpenType
+script tag, <var>langsys</var> is a symbol representing an OpenType langsys
+tag (or <code>nil</code>, which stands for the default langsys), and each
+<var>feature</var> is a symbol representing an OpenType feature tag. 
+</dd></dl>
+        <p></p></blockquote></div>
+
+   <p><a name="index-font-information-for-layout-4673"></a>The following four functions return size information about fonts used
+by various faces, allowing various layout considerations in Lisp
+programs.  These functions take face remapping into consideration,
+returning information about the remapped face, if the face in question
+was remapped.  See <a href="Face-Remapping.html#Face-Remapping">Face Remapping</a>.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/default%2Dfont%2Dwidth"></a><b>default-font-width</b><var><a name="index-default_002dfont_002dwidth-4674"></a></var><br>
+<blockquote><p>This function returns the average width in pixels of the font used by
+the current buffer's default face. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/default%2Dfont%2Dheight"></a><b>default-font-height</b><var><a name="index-default_002dfont_002dheight-4675"></a></var><br>
+<blockquote><p>This function returns the height in pixels of the font used by the
+current buffer's default face. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dfont%2Dwidth"></a><b>window-font-width</b><var> &amp;optional window face<a name="index-window_002dfont_002dwidth-4676"></a></var><br>
+<blockquote><p>This function returns the average width in pixels for the font used by
+<var>face</var> in <var>window</var>.  The specified <var>window</var> must be a live
+window.  If <code>nil</code> or omitted, <var>window</var> defaults to the
+selected window, and <var>face</var> defaults to the default face in
+<var>window</var>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dfont%2Dheight"></a><b>window-font-height</b><var> &amp;optional window face<a name="index-window_002dfont_002dheight-4677"></a></var><br>
+<blockquote><p>This function returns the height in pixels for the font used by
+<var>face</var> in <var>window</var>.  The specified <var>window</var> must be a live
+window.  If <code>nil</code> or omitted, <var>window</var> defaults to the
+selected window, and <var>face</var> defaults to the default face in
+<var>window</var>. 
+</p></blockquote></div>
+
+   
+
+</body></html>

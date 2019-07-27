@@ -1,0 +1,165 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Xwidgets</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Xwidgets"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Buttons.html#Buttons">Buttons</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Images.html#Images">Images</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Display.html#Display">Display</a>
+
+</p></div>
+
+<h3 class="section">39.18 Embedded Native Widgets</h3>
+
+<p><a name="index-xwidget-4804"></a><a name="index-embedded-widgets-4805"></a><a name="index-webkit-browser-widget-4806"></a>
+  Emacs is able to display native widgets, such as GTK+ WebKit widgets,
+in Emacs buffers when it was built with the necessary support
+libraries and is running on a graphical terminal.  To test whether
+Emacs supports display of embedded widgets, check that the
+<code>xwidget-internal</code> feature is available (see <a href="Named-Features.html#Named-Features">Named Features</a>).
+
+   </p><p>To display an embedded widget in a buffer, you must first create an
+xwidget object, and then use that object as the display specifier
+in a <code>display</code> text or overlay property (see <a href="Display-Property.html#Display-Property">Display Property</a>).
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/make%2Dxwidget"></a><b>make-xwidget</b><var> type title width height arguments &amp;optional buffer<a name="index-make_002dxwidget-4807"></a></var><br>
+<blockquote><p>This creates and returns an xwidget object.  If
+<var>buffer</var> is omitted or <code>nil</code>, it defaults to the current
+buffer.  If <var>buffer</var> names a buffer that doesn't exist, it will be
+created.  The <var>type</var> identifies the type of the xwidget component,
+it can be one of the following:
+
+          </p><dl>
+<dt><code>webkit</code></dt><dd>The WebKit component. 
+</dd></dl>
+
+        <p>The <var>width</var> and <var>height</var> arguments specify the widget size in
+pixels, and <var>title</var>, a string, specifies its title. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidgetp"></a><b>xwidgetp</b><var> object<a name="index-xwidgetp-4808"></a></var><br>
+<blockquote><p>This function returns <code>t</code> if <var>object</var> is an xwidget,
+<code>nil</code> otherwise. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dplist"></a><b>xwidget-plist</b><var> xwidget<a name="index-xwidget_002dplist-4809"></a></var><br>
+<blockquote><p>This function returns the property list of <var>xwidget</var>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/set%2Dxwidget%2Dplist"></a><b>set-xwidget-plist</b><var> xwidget plist<a name="index-set_002dxwidget_002dplist-4810"></a></var><br>
+<blockquote><p>This function replaces the property list of <var>xwidget</var> with a new
+property list given by <var>plist</var>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dbuffer"></a><b>xwidget-buffer</b><var> xwidget<a name="index-xwidget_002dbuffer-4811"></a></var><br>
+<blockquote><p>This function returns the buffer of <var>xwidget</var>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/get%2Dbuffer%2Dxwidgets"></a><b>get-buffer-xwidgets</b><var> buffer<a name="index-get_002dbuffer_002dxwidgets-4812"></a></var><br>
+<blockquote><p>This function returns a list of xwidget objects associated with the
+<var>buffer</var>, which can be specified as a buffer object or a name of
+an existing buffer, a string.  The value is <code>nil</code> if <var>buffer</var>
+contains no xwidgets. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dwebkit%2Dgoto%2Duri"></a><b>xwidget-webkit-goto-uri</b><var> xwidget uri<a name="index-xwidget_002dwebkit_002dgoto_002duri-4813"></a></var><br>
+<blockquote><p>This function browses the specified <var>uri</var> in the given
+<var>xwidget</var>.  The <var>uri</var> is a string that specifies the name of a
+file or a URL.  <!-- FIXME: What else can a URI specify in this context? -->
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dwebkit%2Dexecute%2Dscript"></a><b>xwidget-webkit-execute-script</b><var> xwidget script<a name="index-xwidget_002dwebkit_002dexecute_002dscript-4814"></a></var><br>
+<blockquote><p>This function causes the browser widget specified by <var>xwidget</var> to
+execute the specified JavaScript <code>script</code>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dwebkit%2Dexecute%2Dscript%2Drv"></a><b>xwidget-webkit-execute-script-rv</b><var> xwidget script &amp;optional default<a name="index-xwidget_002dwebkit_002dexecute_002dscript_002drv-4815"></a></var><br>
+<blockquote><p>This function executes the specified <var>script</var> like
+<code>xwidget-webkit-execute-script</code> does, but it also returns the
+script's return value as a string.  If <var>script</var> doesn't return a
+value, this function returns <var>default</var>, or <code>nil</code> if
+<var>default</var> was omitted. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dwebkit%2Dget%2Dtitle"></a><b>xwidget-webkit-get-title</b><var> xwidget<a name="index-xwidget_002dwebkit_002dget_002dtitle-4816"></a></var><br>
+<blockquote><p>This function returns the title of <var>xwidget</var> as a string. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dresize"></a><b>xwidget-resize</b><var> xwidget width height<a name="index-xwidget_002dresize-4817"></a></var><br>
+<blockquote><p>This function resizes the specified <var>xwidget</var> to the size
+<var>width</var>x<var>height</var> pixels. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dsize%2Drequest"></a><b>xwidget-size-request</b><var> xwidget<a name="index-xwidget_002dsize_002drequest-4818"></a></var><br>
+<blockquote><p>This function returns the desired size of <var>xwidget</var> as a list of
+the form <code>(</code><var>width</var> <var>height</var><code>)</code>.  The dimensions are in
+pixels. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dinfo"></a><b>xwidget-info</b><var> xwidget<a name="index-xwidget_002dinfo-4819"></a></var><br>
+<blockquote><p>This function returns the attributes of <var>xwidget</var> as a vector of
+the form <code>[</code><var>type</var> <var>title</var> <var>width</var> <var>height</var><code>]</code>. 
+The attributes are usually determined by <code>make-xwidget</code> when the
+xwidget is created. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/set%2Dxwidget%2Dquery%2Don%2Dexit%2Dflag"></a><b>set-xwidget-query-on-exit-flag</b><var> xwidget flag<a name="index-set_002dxwidget_002dquery_002don_002dexit_002dflag-4820"></a></var><br>
+<blockquote><p>This function allows you to arrange that Emacs will ask the user for
+confirmation before exiting or before killing a buffer that has
+<var>xwidget</var> associated with it.  If <var>flag</var> is non-<code>nil</code>,
+Emacs will query the user, otherwise it will not. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/xwidget%2Dquery%2Don%2Dexit%2Dflag"></a><b>xwidget-query-on-exit-flag</b><var> xwidget<a name="index-xwidget_002dquery_002don_002dexit_002dflag-4821"></a></var><br>
+<blockquote><p>This function returns the current setting of <var>xwidget</var>s
+query-on-exit flag, either <code>t</code> or <code>nil</code>. 
+</p></blockquote></div>
+
+   
+
+</body></html>

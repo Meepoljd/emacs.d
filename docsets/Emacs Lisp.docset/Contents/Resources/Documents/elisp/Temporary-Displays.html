@@ -1,0 +1,263 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Temporary Displays</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Temporary-Displays"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Overlays.html#Overlays">Overlays</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Selective-Display.html#Selective-Display">Selective Display</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Display.html#Display">Display</a>
+
+</p></div>
+
+<h3 class="section">39.8 Temporary Displays</h3>
+
+<p><a name="index-temporary-display-4497"></a><a name="index-temporary-buffer-display-4498"></a>
+  Temporary displays are used by Lisp programs to put output into a
+buffer and then present it to the user for perusal rather than for
+editing.  Many help commands use this feature.
+
+</p><div class="defun">
+— Macro: <a class="dashAnchor" name="//apple_ref/Macro/with%2Doutput%2Dto%2Dtemp%2Dbuffer"></a><b>with-output-to-temp-buffer</b><var> buffer-name body<small class="dots">...</small><a name="index-with_002doutput_002dto_002dtemp_002dbuffer-4499"></a></var><br>
+<blockquote><p>This function executes the forms in <var>body</var> while arranging to insert
+any output they print into the buffer named <var>buffer-name</var>, which is
+first created if necessary, and put into Help mode.  (See the similar
+form <code>with-temp-buffer-window</code> below.)  Finally, the buffer is
+displayed in some window, but that window is not selected.
+
+        </p><p>If the forms in <var>body</var> do not change the major mode in the output
+buffer, so that it is still Help mode at the end of their execution,
+then <code>with-output-to-temp-buffer</code> makes this buffer read-only at
+the end, and also scans it for function and variable names to make them
+into clickable cross-references.  See <a href="Docstring-hyperlinks.html#Docstring-hyperlinks">Tips for Documentation Strings</a>, in particular the item on hyperlinks in
+documentation strings, for more details.
+
+        </p><p>The string <var>buffer-name</var> specifies the temporary buffer, which need
+not already exist.  The argument must be a string, not a buffer.  The
+buffer is erased initially (with no questions asked), and it is marked
+as unmodified after <code>with-output-to-temp-buffer</code> exits.
+
+        </p><p><code>with-output-to-temp-buffer</code> binds <code>standard-output</code> to the
+temporary buffer, then it evaluates the forms in <var>body</var>.  Output
+using the Lisp output functions within <var>body</var> goes by default to
+that buffer (but screen display and messages in the echo area, although
+they are “output” in the general sense of the word, are not affected). 
+See <a href="Output-Functions.html#Output-Functions">Output Functions</a>.
+
+        </p><p>Several hooks are available for customizing the behavior
+of this construct; they are listed below.
+
+        </p><p>The value of the last form in <var>body</var> is returned.
+
+     </p><pre class="example">          ---------- Buffer: foo ----------
+           This is the contents of foo.
+          ---------- Buffer: foo ----------
+          
+          (with-output-to-temp-buffer "foo"
+              (print 20)
+              (print standard-output))
+          ⇒ #&lt;buffer foo&gt;
+          
+          ---------- Buffer: foo ----------
+          
+          20
+          
+          #&lt;buffer foo&gt;
+          
+          ---------- Buffer: foo ----------
+</pre>
+        </blockquote></div>
+
+<div class="defun">
+— User Option: <a class="dashAnchor" name="//apple_ref/Option/temp%2Dbuffer%2Dshow%2Dfunction"></a><b>temp-buffer-show-function</b><var><a name="index-temp_002dbuffer_002dshow_002dfunction-4500"></a></var><br>
+<blockquote><p>If this variable is non-<code>nil</code>, <code>with-output-to-temp-buffer</code>
+calls it as a function to do the job of displaying a help buffer.  The
+function gets one argument, which is the buffer it should display.
+
+        </p><p>It is a good idea for this function to run <code>temp-buffer-show-hook</code>
+just as <code>with-output-to-temp-buffer</code> normally would, inside of
+<code>save-selected-window</code> and with the chosen window and buffer
+selected. 
+</p></blockquote></div>
+
+<div class="defun">
+— Variable: <a class="dashAnchor" name="//apple_ref/Variable/temp%2Dbuffer%2Dsetup%2Dhook"></a><b>temp-buffer-setup-hook</b><var><a name="index-temp_002dbuffer_002dsetup_002dhook-4501"></a></var><br>
+<blockquote><p>This normal hook is run by <code>with-output-to-temp-buffer</code> before
+evaluating <var>body</var>.  When the hook runs, the temporary buffer is
+current.  This hook is normally set up with a function to put the
+buffer in Help mode. 
+</p></blockquote></div>
+
+<div class="defun">
+— Variable: <a class="dashAnchor" name="//apple_ref/Variable/temp%2Dbuffer%2Dshow%2Dhook"></a><b>temp-buffer-show-hook</b><var><a name="index-temp_002dbuffer_002dshow_002dhook-4502"></a></var><br>
+<blockquote><p>This normal hook is run by <code>with-output-to-temp-buffer</code> after
+displaying the temporary buffer.  When the hook runs, the temporary buffer
+is current, and the window it was displayed in is selected. 
+</p></blockquote></div>
+
+<div class="defun">
+— Macro: <a class="dashAnchor" name="//apple_ref/Macro/with%2Dtemp%2Dbuffer%2Dwindow"></a><b>with-temp-buffer-window</b><var> buffer-or-name action quit-function body<small class="dots">...</small><a name="index-with_002dtemp_002dbuffer_002dwindow-4503"></a></var><br>
+<blockquote><p>This macro is similar to <code>with-output-to-temp-buffer</code>.  Like that
+construct, it executes <var>body</var> while arranging to insert any output
+it prints into the buffer named <var>buffer-or-name</var> and displays that
+buffer in some window.  Unlike <code>with-output-to-temp-buffer</code>,
+however, it does not automatically switch that buffer to Help mode.
+
+        </p><p>The argument <var>buffer-or-name</var> specifies the temporary buffer.  It
+can be either a buffer, which must already exist, or a string, in which
+case a buffer of that name is created, if necessary.  The buffer is
+marked as unmodified and read-only when <code>with-temp-buffer-window</code>
+exits.
+
+        </p><p>This macro does not call <code>temp-buffer-show-function</code>.  Rather, it
+passes the <var>action</var> argument to <code>display-buffer</code>
+(see <a href="Choosing-Window.html#Choosing-Window">Choosing Window</a>) in order to display the buffer.
+
+        </p><p>The value of the last form in <var>body</var> is returned, unless the
+argument <var>quit-function</var> is specified.  In that case, it is called
+with two arguments: the window showing the buffer and the result of
+<var>body</var>.  The final return value is then whatever <var>quit-function</var>
+returns.
+
+        </p><p><a name="index-temp_002dbuffer_002dwindow_002dsetup_002dhook-4504"></a><a name="index-temp_002dbuffer_002dwindow_002dshow_002dhook-4505"></a>This macro uses the normal hooks <code>temp-buffer-window-setup-hook</code>
+and <code>temp-buffer-window-show-hook</code> in place of the analogous hooks
+run by <code>with-output-to-temp-buffer</code>. 
+</p></blockquote></div>
+
+   <p>The two constructs described next are mostly identical to
+<code>with-temp-buffer-window</code> but differ from it as specified:
+
+</p><div class="defun">
+— Macro: <a class="dashAnchor" name="//apple_ref/Macro/with%2Dcurrent%2Dbuffer%2Dwindow"></a><b>with-current-buffer-window</b><var> buffer-or-name action quit-function &amp;rest body<a name="index-with_002dcurrent_002dbuffer_002dwindow-4506"></a></var><br>
+<blockquote><p>This macro is like <code>with-temp-buffer-window</code> but unlike that makes
+the buffer specified by <var>buffer-or-name</var> current for running
+<var>body</var>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Macro: <a class="dashAnchor" name="//apple_ref/Macro/with%2Ddisplayed%2Dbuffer%2Dwindow"></a><b>with-displayed-buffer-window</b><var> buffer-or-name action quit-function &amp;rest body<a name="index-with_002ddisplayed_002dbuffer_002dwindow-4507"></a></var><br>
+<blockquote><p>This macro is like <code>with-current-buffer-window</code> but unlike that
+displays the buffer specified by <var>buffer-or-name</var> <em>before</em>
+running <var>body</var>. 
+</p></blockquote></div>
+
+   <p>A window showing a temporary buffer can be fitted to the size of that
+buffer using the following mode:
+
+</p><div class="defun">
+— User Option: <a class="dashAnchor" name="//apple_ref/Option/temp%2Dbuffer%2Dresize%2Dmode"></a><b>temp-buffer-resize-mode</b><var><a name="index-temp_002dbuffer_002dresize_002dmode-4508"></a></var><br>
+<blockquote><p>When this minor mode is enabled, windows showing a temporary buffer are
+automatically resized to fit their buffer's contents.
+
+        </p><p>A window is resized if and only if it has been specially created for the
+buffer.  In particular, windows that have shown another buffer before
+are not resized.  By default, this mode uses <code>fit-window-to-buffer</code>
+(see <a href="Resizing-Windows.html#Resizing-Windows">Resizing Windows</a>) for resizing.  You can specify a different
+function by customizing the options <code>temp-buffer-max-height</code> and
+<code>temp-buffer-max-width</code> below. 
+</p></blockquote></div>
+
+<div class="defun">
+— User Option: <a class="dashAnchor" name="//apple_ref/Option/temp%2Dbuffer%2Dmax%2Dheight"></a><b>temp-buffer-max-height</b><var><a name="index-temp_002dbuffer_002dmax_002dheight-4509"></a></var><br>
+<blockquote><p>This option specifies the maximum height (in lines) of a window
+displaying a temporary buffer when <code>temp-buffer-resize-mode</code> is
+enabled.  It can also be a function to be called to choose the height
+for such a buffer.  It gets one argument, the buffer, and should return
+a positive integer.  At the time the function is called, the window to
+be resized is selected. 
+</p></blockquote></div>
+
+<div class="defun">
+— User Option: <a class="dashAnchor" name="//apple_ref/Option/temp%2Dbuffer%2Dmax%2Dwidth"></a><b>temp-buffer-max-width</b><var><a name="index-temp_002dbuffer_002dmax_002dwidth-4510"></a></var><br>
+<blockquote><p>This option specifies the maximum width of a window (in columns)
+displaying a temporary buffer when <code>temp-buffer-resize-mode</code> is
+enabled.  It can also be a function to be called to choose the width for
+such a buffer.  It gets one argument, the buffer, and should return a
+positive integer.  At the time the function is called, the window to be
+resized is selected. 
+</p></blockquote></div>
+
+   <p>The following function uses the current buffer for temporary display:
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/momentary%2Dstring%2Ddisplay"></a><b>momentary-string-display</b><var> string position &amp;optional char message<a name="index-momentary_002dstring_002ddisplay-4511"></a></var><br>
+<blockquote><p>This function momentarily displays <var>string</var> in the current buffer at
+<var>position</var>.  It has no effect on the undo list or on the buffer's
+modification status.
+
+        </p><p>The momentary display remains until the next input event.  If the next
+input event is <var>char</var>, <code>momentary-string-display</code> ignores it
+and returns.  Otherwise, that event remains buffered for subsequent use
+as input.  Thus, typing <var>char</var> will simply remove the string from
+the display, while typing (say) <kbd>C-f</kbd> will remove the string from
+the display and later (presumably) move point forward.  The argument
+<var>char</var> is a space by default.
+
+        </p><p>The return value of <code>momentary-string-display</code> is not meaningful.
+
+        </p><p>If the string <var>string</var> does not contain control characters, you can
+do the same job in a more general way by creating (and then subsequently
+deleting) an overlay with a <code>before-string</code> property. 
+See <a href="Overlay-Properties.html#Overlay-Properties">Overlay Properties</a>.
+
+        </p><p>If <var>message</var> is non-<code>nil</code>, it is displayed in the echo area
+while <var>string</var> is displayed in the buffer.  If it is <code>nil</code>, a
+default message says to type <var>char</var> to continue.
+
+        </p><p>In this example, point is initially located at the beginning of the
+second line:
+
+     </p><pre class="example">          ---------- Buffer: foo ----------
+          This is the contents of foo.
+          -!-Second line.
+          ---------- Buffer: foo ----------
+          
+          (momentary-string-display
+            "**** Important Message! ****"
+            (point) ?\r
+            "Type RET when done reading")
+          ⇒ t
+          
+          ---------- Buffer: foo ----------
+          This is the contents of foo.
+          **** Important Message! ****Second line.
+          ---------- Buffer: foo ----------
+          
+          ---------- Echo Area ----------
+          Type RET when done reading
+          ---------- Echo Area ----------
+</pre>
+        </blockquote></div>
+
+   
+
+</body></html>

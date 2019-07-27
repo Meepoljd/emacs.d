@@ -1,0 +1,100 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Time Zone Rules</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Time-Zone-Rules"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Time-Conversion.html#Time-Conversion">Time Conversion</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Time-of-Day.html#Time-of-Day">Time of Day</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="System-Interface.html#System-Interface">System Interface</a>
+
+</p></div>
+
+<h3 class="section">40.6 Time Zone Rules</h3>
+
+<p><a name="index-time-zone-rules-5092"></a>
+<a name="index-TZ_0040r_007b_002c-environment-variable_007d-5093"></a>The default time zone is determined by the <samp><span class="env">TZ</span></samp> environment
+variable.  See <a href="System-Environment.html#System-Environment">System Environment</a>.  For example, you can tell Emacs
+to default to Universal Time with <code>(setenv "TZ" "UTC0")</code>.  If
+<samp><span class="env">TZ</span></samp> is not in the environment, Emacs uses system wall clock time,
+which is a platform-dependent default time zone.
+
+   </p><p>The set of supported <samp><span class="env">TZ</span></samp> strings is system-dependent.  GNU and
+many other systems support the tzdata database, e.g.,
+‘<samp><span class="samp">"America/New_York"</span></samp>’ specifies the time zone and daylight saving
+time history for locations near New York City.  GNU and most other
+systems support POSIX-style <samp><span class="env">TZ</span></samp> strings, e.g.,
+‘<samp><span class="samp">"EST+5EDT,M4.1.0/2,M10.5.0/2"</span></samp>’ specifies the rules used in New
+York from 1987 through 2006.  All systems support the string
+‘<samp><span class="samp">"UTC0"</span></samp>’ meaning Universal Time.
+
+   </p><p><a name="index-time-zone-rule-5094"></a>Functions that convert to and from local time accept an optional
+<dfn>time zone rule</dfn> argument, which specifies the conversion's time
+zone and daylight saving time history.  If the time zone rule is
+omitted or <code>nil</code>, the conversion uses Emacs's default time zone. 
+If it is <code>t</code>, the conversion uses Universal Time.  If it is
+<code>wall</code>, the conversion uses the system wall clock time.  If it is
+a string, the conversion uses the time zone rule equivalent to setting
+<samp><span class="env">TZ</span></samp> to that string.  If it is a list (<var>offset</var> <var>abbr</var>), where
+<var>offset</var> is an integer number of seconds east of Universal Time
+and <var>abbr</var> is a string, the conversion uses a fixed time zone with
+the given offset and abbreviation.  An integer <var>offset</var> is treated
+as if it were (<var>offset</var> <var>abbr</var>), where <var>abbr</var> is a numeric
+abbreviation on POSIX-compatible platforms and is unspecified on
+MS-Windows.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/current%2Dtime%2Dzone"></a><b>current-time-zone</b><var> &amp;optional time zone<a name="index-current_002dtime_002dzone-5095"></a></var><br>
+<blockquote><p><a name="index-time-zone_002c-current-5096"></a>This function returns a list describing the time zone that the user is
+in.
+
+        </p><p>The value has the form <code>(</code><var>offset</var> <var>abbr</var><code>)</code>.  Here
+<var>offset</var> is an integer giving the number of seconds ahead of Universal Time
+(east of Greenwich).  A negative value means west of Greenwich.  The
+second element, <var>abbr</var>, is a string giving an abbreviation for the
+time zone, e.g., ‘<samp><span class="samp">"CST"</span></samp>’ for China Standard Time or for
+U.S. Central Standard Time.  Both elements can change when daylight
+saving time begins or ends; if the user has specified a time zone that
+does not use a seasonal time adjustment, then the value is constant
+through time.
+
+        </p><p>If the operating system doesn't supply all the information necessary to
+compute the value, the unknown elements of the list are <code>nil</code>.
+
+        </p><p>The argument <var>time</var>, if given, specifies a time value to
+analyze instead of the current time.  The optional argument <var>zone</var>
+defaults to the current time zone rule. 
+</p></blockquote></div>
+
+   
+
+</body></html>

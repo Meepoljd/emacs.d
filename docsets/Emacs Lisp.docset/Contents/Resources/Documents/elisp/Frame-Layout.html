@@ -1,0 +1,346 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Frame Layout</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Frame-Layout"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Frame-Font.html#Frame-Font">Frame Font</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>
+
+</p></div>
+
+<h4 class="subsection">29.3.1 Frame Layout</h4>
+
+<p><a name="index-frame-layout-2946"></a><a name="index-layout-of-frame-2947"></a>
+A visible frame occupies a rectangular area on its terminal's display. 
+This area may contain a number of nested rectangles, each serving a
+different purpose.  The drawing below sketches the layout of a frame on
+a graphical terminal:
+</p><pre class="smallexample">     
+             &lt;------------ Outer Frame Width -----------&gt;
+             ____________________________________________
+          ^(0)  ________ External/Outer Border _______   |
+          | |  |_____________ Title Bar ______________|  |
+          | | (1)_____________ Menu Bar ______________|  | ^
+          | | (2)_____________ Tool Bar ______________|  | ^
+          | | (3) _________ Internal Border ________  |  | ^
+          | |  | |   ^                              | |  | |
+          | |  | |   |                              | |  | |
+     Outer  |  | | Inner                            | |  | Native
+     Frame  |  | | Frame                            | |  | Frame
+     Height |  | | Height                           | |  | Height
+          | |  | |   |                              | |  | |
+          | |  | |&lt;--+--- Inner Frame Width -------&gt;| |  | |
+          | |  | |   |                              | |  | |
+          | |  | |___v______________________________| |  | |
+          | |  |___________ Internal Border __________|  | v
+          v |___________ External/Outer Border __________|
+                &lt;-------- Native Frame Width --------&gt;
+</pre>
+   <p>In practice not all of the areas shown in the drawing will or may be
+present.  The meaning of these areas is described below.
+
+     </p><dl>
+<dt>‘<samp><span class="samp">Outer Frame</span></samp>’</dt><dd><a name="index-outer-frame-2948"></a><a name="index-outer-edges-2949"></a><a name="index-outer-width-2950"></a><a name="index-outer-height-2951"></a><a name="index-outer-size-2952"></a>The <dfn>outer frame</dfn> is a rectangle comprising all areas shown in the
+drawing.  The edges of that rectangle are called the <dfn>outer edges</dfn>
+of the frame.  Together, the <dfn>outer width</dfn> and <dfn>outer height</dfn> of
+the frame specify the <dfn>outer size</dfn> of that rectangle.
+
+     <p>Knowing the outer size of a frame is useful for fitting a frame into the
+working area of its display (see <a href="Multiple-Terminals.html#Multiple-Terminals">Multiple Terminals</a>) or for placing
+two frames adjacent to each other on the screen.  Usually, the outer
+size of a frame is available only after the frame has been mapped (made
+visible, see <a href="Visibility-of-Frames.html#Visibility-of-Frames">Visibility of Frames</a>) at least once.  For the initial
+frame or a frame that has not been created yet, the outer size can be
+only estimated or must be calculated from the window-system's or window
+manager's defaults.  One workaround is to obtain the differences of the
+outer and native (see below) sizes of a mapped frame and use them for
+calculating the outer size of the new frame.
+
+     </p><p><a name="index-outer-position-2953"></a>The position of the upper left corner of the outer frame (indicated by
+‘<samp><span class="samp">(0)</span></samp>’ in the drawing above) is the <dfn>outer position</dfn> of the
+frame.  The outer position of a graphical frame is also referred to as
+“the position” of the frame because it usually remains unchanged on
+its display whenever the frame is resized or its layout is changed.
+
+     </p><p>The outer position is specified by and can be set via the <code>left</code>
+and <code>top</code> frame parameters (see <a href="Position-Parameters.html#Position-Parameters">Position Parameters</a>).  For a
+normal, top-level frame these parameters usually represent its absolute
+position (see below) with respect to its display's origin.  For a child
+frame (see <a href="Child-Frames.html#Child-Frames">Child Frames</a>) these parameters represent its position
+relative to the native position (see below) of its parent frame.  For
+frames on text terminals the values of these parameters are meaningless
+and always zero.
+
+     <br></p></dd><dt>‘<samp><span class="samp">External Border</span></samp>’</dt><dd><a name="index-external-border-2954"></a>The <dfn>external border</dfn> is part of the decorations supplied by the
+window manager.  It is typically used for resizing the frame with the
+mouse and is therefore not shown on “fullboth” and maximized frames
+(see <a href="Size-Parameters.html#Size-Parameters">Size Parameters</a>).  Its width is determined by the window
+manager and cannot be changed by Emacs' functions.
+
+     <p>External borders don't exist on text terminal frames.  For graphical
+frames, their display can be suppressed by setting the
+<code>override-redirect</code> or <code>undecorated</code> frame parameter
+(see <a href="Management-Parameters.html#Management-Parameters">Management Parameters</a>).
+
+     <br></p></dd><dt>‘<samp><span class="samp">Outer Border</span></samp>’</dt><dd><a name="index-outer-border-2955"></a>The <dfn>outer border</dfn> is a separate border whose width can be specified
+with the <code>border-width</code> frame parameter (see <a href="Layout-Parameters.html#Layout-Parameters">Layout Parameters</a>).  In practice, either the external or the outer border of a
+frame are displayed but never both at the same time.  Usually, the outer
+border is shown only for special frames that are not (fully) controlled
+by the window manager like tooltip frames (see <a href="Tooltips.html#Tooltips">Tooltips</a>), child
+frames (see <a href="Child-Frames.html#Child-Frames">Child Frames</a>) and <code>undecorated</code> or
+<code>override-redirect</code> frames (see <a href="Management-Parameters.html#Management-Parameters">Management Parameters</a>).
+
+     <p>Outer borders are never shown on text terminal frames and on frames
+generated by GTK+ routines.  On MS-Windows, the outer border is emulated
+with the help of a one pixel wide external border.  Non-toolkit builds
+on X allow to change the color of the outer border by setting the
+<code>border-color</code> frame parameter (see <a href="Layout-Parameters.html#Layout-Parameters">Layout Parameters</a>).
+
+     <br></p></dd><dt>‘<samp><span class="samp">Title Bar</span></samp>’</dt><dd><a name="index-title-bar-2956"></a><a name="index-caption-bar-2957"></a>The <dfn>title bar</dfn>, a.k.a. <dfn>caption bar</dfn>, is also part of the
+window manager's decorations and typically displays the title of the
+frame (see <a href="Frame-Titles.html#Frame-Titles">Frame Titles</a>) as well as buttons for minimizing,
+maximizing and deleting the frame.  It can be also used for dragging
+the frame with the mouse.  The title bar is usually not displayed for
+fullboth (see <a href="Size-Parameters.html#Size-Parameters">Size Parameters</a>), tooltip (see <a href="Tooltips.html#Tooltips">Tooltips</a>) and
+child frames (see <a href="Child-Frames.html#Child-Frames">Child Frames</a>) and doesn't exist for terminal
+frames.  Display of the title bar can be suppressed by setting the
+<code>override-redirect</code> or the <code>undecorated</code> frame parameters
+(see <a href="Management-Parameters.html#Management-Parameters">Management Parameters</a>).
+
+     <br></dd><dt>‘<samp><span class="samp">Menu Bar</span></samp>’</dt><dd><a name="index-internal-menu-bar-2958"></a><a name="index-external-menu-bar-2959"></a>The menu bar (see <a href="Menu-Bar.html#Menu-Bar">Menu Bar</a>) can be either internal (drawn by Emacs
+itself) or external (drawn by the toolkit).  Most builds (GTK+, Lucid,
+Motif and MS-Windows) rely on an external menu bar.  NS also uses an
+external menu bar which, however, is not part of the outer frame. 
+Non-toolkit builds can provide an internal menu bar.  On text terminal
+frames, the menu bar is part of the frame's root window (see <a href="Windows-and-Frames.html#Windows-and-Frames">Windows and Frames</a>).  As a rule, menu bars are never shown on child frames
+(see <a href="Child-Frames.html#Child-Frames">Child Frames</a>).  Display of the menu bar can be suppressed by
+setting the <code>menu-bar-lines</code> parameter (see <a href="Layout-Parameters.html#Layout-Parameters">Layout Parameters</a>)
+to zero.
+
+     <p>Whether the menu bar is wrapped or truncated whenever its width
+becomes too large to fit on its frame depends on the toolkit . 
+Usually, only Motif and MS-Windows builds can wrap the menu bar.  When
+they (un-)wrap the menu bar, they try to keep the outer height of the
+frame unchanged, so the native height of the frame (see below) will
+change instead.
+
+     <br></p></dd><dt>‘<samp><span class="samp">Tool Bar</span></samp>’</dt><dd><a name="index-internal-tool-bar-2960"></a><a name="index-external-tool-bar-2961"></a>Like the menu bar, the tool bar (see <a href="Tool-Bar.html#Tool-Bar">Tool Bar</a>) can be either
+internal (drawn by Emacs itself) or external (drawn by a toolkit).  The
+GTK+ and NS builds have the tool bar drawn by the toolkit.  The
+remaining builds use internal tool bars.  With GTK+ the tool bar can be
+located on either side of the frame, immediately outside the internal
+border, see below.  Tool bars are usually not shown for child frames
+(see <a href="Child-Frames.html#Child-Frames">Child Frames</a>).  Display of the tool bar can be suppressed by
+setting the <code>tool-bar-lines</code> parameter (see <a href="Layout-Parameters.html#Layout-Parameters">Layout Parameters</a>) to zero.
+
+     <p>If the variable <code>auto-resize-tool-bars</code> is non-<code>nil</code>, Emacs
+wraps the internal tool bar when its width becomes too large for its
+frame.  If and when Emacs (un-)wraps the internal tool bar, it by
+default keeps the outer height of the frame unchanged, so the native
+height of the frame (see below) will change instead.  Emacs built with
+GTK+, on the other hand, never wraps the tool bar but may
+automatically increase the outer width of a frame in order to
+accommodate an overlong tool bar.
+
+     <br></p></dd><dt>‘<samp><span class="samp">Native Frame</span></samp>’</dt><dd><a name="index-native-frame-2962"></a><a name="index-native-edges-2963"></a><a name="index-native-width-2964"></a><a name="index-native-height-2965"></a><a name="index-native-size-2966"></a>The <dfn>native frame</dfn> is a rectangle located entirely within the outer
+frame.  It excludes the areas occupied by an external or outer border,
+the title bar and any external menu or tool bar.  The edges of the
+native frame are called the <dfn>native edges</dfn> of the frame.  Together,
+the <dfn>native width</dfn> and <dfn>native height</dfn> of a frame specify the
+<dfn>native size</dfn> of the frame.
+
+     <p>The native size of a frame is the size Emacs passes to the window-system
+or window manager when creating or resizing the frame from within Emacs. 
+It is also the size Emacs receives from the window-system or window
+manager whenever these resize the frame's window-system window, for
+example, after maximizing the frame by clicking on the corresponding
+button in the title bar or when dragging its external border with the
+mouse.
+
+     </p><p><a name="index-native-position-2967"></a>The position of the top left corner of the native frame specifies the
+<dfn>native position</dfn> of the frame.  (1)–(3) in the drawing above
+indicate that position for the various builds:
+
+          </p><ul>
+<li>(1) non-toolkit and terminal frames
+
+          </li><li>(2) Lucid, Motif and MS-Windows frames
+
+          </li><li>(3) GTK+ and NS frames
+</li></ul>
+
+     <p>Accordingly, the native height of a frame may include the height of the
+tool bar but not that of the menu bar (Lucid, Motif, MS-Windows) or
+those of the menu bar and the tool bar (non-toolkit and text terminal
+frames).
+
+     </p><p>The native position of a frame is the reference position for functions
+that set or return the current position of the mouse (see <a href="Mouse-Position.html#Mouse-Position">Mouse Position</a>) and for functions dealing with the position of windows like
+<code>window-edges</code>, <code>window-at</code> or <code>coordinates-in-window-p</code>
+(see <a href="Coordinates-and-Windows.html#Coordinates-and-Windows">Coordinates and Windows</a>).  It also specifies the (0, 0) origin
+for locating and positioning child frames within this frame
+(see <a href="Child-Frames.html#Child-Frames">Child Frames</a>).
+
+     </p><p>Note also that the native position of a frame usually remains unaltered
+on its display when removing or adding the window manager decorations by
+changing the frame's <code>override-redirect</code> or <code>undecorated</code>
+parameter (see <a href="Management-Parameters.html#Management-Parameters">Management Parameters</a>).
+
+     <br></p></dd><dt>‘<samp><span class="samp">Internal Border</span></samp>’</dt><dd>The internal border is a border drawn by Emacs around the inner frame
+(see below).  Its width is specified by the <code>internal-border-width</code>
+frame parameter (see <a href="Layout-Parameters.html#Layout-Parameters">Layout Parameters</a>).  Its color is specified by
+the background of the <code>internal-border</code> face.
+
+     <br></dd><dt>‘<samp><span class="samp">Inner Frame</span></samp>’</dt><dd><a name="index-inner-frame-2968"></a><a name="index-inner-edges-2969"></a><a name="index-inner-width-2970"></a><a name="index-inner-height-2971"></a><a name="index-inner-size-2972"></a><a name="index-display-area-2973"></a>The <dfn>inner frame</dfn> is the rectangle reserved for the frame's windows. 
+It's enclosed by the internal border which, however, is not part of the
+inner frame.  Its edges are called the <dfn>inner edges</dfn> of the frame. 
+The <dfn>inner width</dfn> and <dfn>inner height</dfn> specify the <dfn>inner
+size</dfn> of the rectangle.  The inner frame is sometimes also referred to
+as the <dfn>display area</dfn> of the frame.
+
+     <p><a name="index-minibuffer_002dless-frame-2974"></a><a name="index-minibuffer_002donly-frame-2975"></a>As a rule, the inner frame is subdivided into the frame's root window
+(see <a href="Windows-and-Frames.html#Windows-and-Frames">Windows and Frames</a>) and the frame's minibuffer window
+(see <a href="Minibuffer-Windows.html#Minibuffer-Windows">Minibuffer Windows</a>).  There are two notable exceptions to this
+rule: A <dfn>minibuffer-less frame</dfn> contains a root window only and does
+not contain a minibuffer window.  A <dfn>minibuffer-only frame</dfn> contains
+only a minibuffer window which also serves as that frame's root window. 
+See <a href="Initial-Parameters.html#Initial-Parameters">Initial Parameters</a> for how to create such frame
+configurations.
+
+     <br></p></dd><dt>‘<samp><span class="samp">Text Area</span></samp>’</dt><dd><a name="index-text-area-2976"></a>The <dfn>text area</dfn> of a frame is a somewhat fictitious area that can be
+embedded in the native frame.  Its position is unspecified.  Its width
+can be obtained by removing from that of the native width the widths of
+the internal border, one vertical scroll bar, and one left and one right
+fringe if they are specified for this frame, see <a href="Layout-Parameters.html#Layout-Parameters">Layout Parameters</a>.  Its height can be obtained by removing from that of the
+native height the widths of the internal border and the heights of the
+frame's internal menu and tool bars and one horizontal scroll bar if
+specified for this frame. 
+</dd></dl>
+
+   <p><a name="index-absolute-position-2977"></a><a name="index-absolute-frame-position-2978"></a><a name="index-absolute-edges-2979"></a><a name="index-absolute-frame-edges-2980"></a><a name="index-display-origin-2981"></a><a name="index-origin-of-display-2982"></a>The <dfn>absolute position</dfn> of a frame is given as a pair (X, Y) of
+horizontal and vertical pixel offsets relative to an origin (0, 0) of
+the frame's display.  Correspondingly, the <dfn>absolute edges</dfn> of a
+frame are given as pixel offsets from that origin.
+
+   </p><p>Note that with multiple monitors, the origin of the display does not
+necessarily coincide with the top-left corner of the entire usable
+display area of the terminal.  Hence the absolute position of a frame
+can be negative in such an environment even when that frame is
+completely visible.
+
+   </p><p>By convention, vertical offsets increase “downwards”.  This means
+that the height of a frame is obtained by subtracting the offset of its
+top edge from that of its bottom edge.  Horizontal offsets increase
+“rightwards”, as expected, so a frame's width is calculated by
+subtracting the offset of its left edge from that of its right edge.
+
+   </p><p>For a frame on a graphical terminal the following function returns the
+sizes of the areas described above:
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/frame%2Dgeometry"></a><b>frame-geometry</b><var> &amp;optional frame<a name="index-frame_002dgeometry-2983"></a></var><br>
+<blockquote><p>This function returns geometric attributes of <var>frame</var>.  The return
+value is an association list of the attributes listed below.  All
+coordinate, height and width values are integers counting pixels.  Note
+that if <var>frame</var> has not been mapped yet, (see <a href="Visibility-of-Frames.html#Visibility-of-Frames">Visibility of Frames</a>) some of the return values may only represent approximations of
+the actual values—those that can be seen after the frame has been
+mapped.
+
+          </p><dl>
+<dt><code>outer-position</code></dt><dd>A cons representing the absolute position of the outer <var>frame</var>,
+relative to the origin at position (0, 0) of <var>frame</var>'s display.
+
+          <br></dd><dt><code>outer-size</code></dt><dd>A cons of the outer width and height of <var>frame</var>.
+
+          <br></dd><dt><code>external-border-size</code></dt><dd>A cons of the horizontal and vertical width of <var>frame</var>'s external
+borders as supplied by the window manager.  If the window manager
+doesn't supply these values, Emacs will try to guess them from the
+coordinates of the outer and inner frame.
+
+          <br></dd><dt><code>outer-border-width</code></dt><dd>The width of the outer border of <var>frame</var>.  The value is meaningful
+for non-GTK+ X builds only.
+
+          <br></dd><dt><code>title-bar-size</code></dt><dd>A cons of the width and height of the title bar of <var>frame</var> as
+supplied by the window manager or operating system.  If both of them are
+zero, the frame has no title bar.  If only the width is zero, Emacs was
+not able to retrieve the width information.
+
+          <br></dd><dt><code>menu-bar-external</code></dt><dd>If non-<code>nil</code>, this means the menu bar is external (not part of the
+native frame of <var>frame</var>).
+
+          <br></dd><dt><code>menu-bar-size</code></dt><dd>A cons of the width and height of the menu bar of <var>frame</var>.
+
+          <br></dd><dt><code>tool-bar-external</code></dt><dd>If non-<code>nil</code>, this means the tool bar is external (not part of the
+native frame of <var>frame</var>).
+
+          <br></dd><dt><code>tool-bar-position</code></dt><dd>This tells on which side the tool bar on <var>frame</var> is and can be one
+of <code>left</code>, <code>top</code>, <code>right</code> or <code>bottom</code>.  The only
+toolkit that currently supports a value other than <code>top</code> is GTK+.
+
+          <br></dd><dt><code>tool-bar-size</code></dt><dd>A cons of the width and height of the tool bar of <var>frame</var>.
+
+          <br></dd><dt><code>internal-border-width</code></dt><dd>The width of the internal border of <var>frame</var>. 
+</dd></dl>
+        <p></p></blockquote></div>
+
+   <p>The following function can be used to retrieve the edges of the outer,
+native and inner frame.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/frame%2Dedges"></a><b>frame-edges</b><var> &amp;optional frame type<a name="index-frame_002dedges-2984"></a></var><br>
+<blockquote><p>This function returns the absolute edges of the outer, native or inner
+frame of <var>frame</var>.  <var>frame</var> must be a live frame and defaults to
+the selected one.  The returned list has the form <code>(</code><var>left</var><code>&nbsp;</code><var>top</var><code>&nbsp;</code><var>right</var><code>&nbsp;</code><var>bottom</var><code>)</code><!-- /@w --> where all values are in pixels
+relative to the origin of <var>frame</var>'s display.  For terminal frames
+the values returned for <var>left</var> and <var>top</var> are always zero.
+
+        </p><p>Optional argument <var>type</var> specifies the type of the edges to return:
+<code>outer-edges</code> means to return the outer edges of <var>frame</var>,
+<code>native-edges</code> (or <code>nil</code>) means to return its native edges and
+<code>inner-edges</code> means to return its inner edges.
+
+        </p><p>By convention, the pixels of the display at the values returned for
+<var>left</var> and <var>top</var> are considered to be inside (part of)
+<var>frame</var>.  Hence, if <var>left</var> and <var>top</var> are both zero, the
+pixel at the display's origin is part of <var>frame</var>.  The pixels at
+<var>bottom</var> and <var>right</var>, on the other hand, are considered to lie
+immediately outside <var>frame</var>.  This means that if you have, for
+example, two side-by-side frames positioned such that the right outer
+edge of the frame on the left equals the left outer edge of the frame on
+the right, the pixels at that edge show a part of the frame on the
+right. 
+</p></blockquote></div>
+
+   
+
+</body></html>

@@ -1,0 +1,149 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Mapping Functions</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Mapping-Functions"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Anonymous-Functions.html#Anonymous-Functions">Anonymous Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Calling-Functions.html#Calling-Functions">Calling Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Functions.html#Functions">Functions</a>
+
+</p></div>
+
+<h3 class="section">13.6 Mapping Functions</h3>
+
+<p><a name="index-mapping-functions-945"></a>
+  A <dfn>mapping function</dfn> applies a given function (<em>not</em> a
+special form or macro) to each element of a list or other collection. 
+Emacs Lisp has several such functions; this section describes
+<code>mapcar</code>, <code>mapc</code>, <code>mapconcat</code>, and <code>mapcan</code>, which
+map over a list.  See <a href="Definition-of-mapatoms.html#Definition-of-mapatoms">Definition of mapatoms</a>, for the function
+<code>mapatoms</code> which maps over the symbols in an obarray. 
+See <a href="Definition-of-maphash.html#Definition-of-maphash">Definition of maphash</a>, for the function <code>maphash</code> which
+maps over key/value associations in a hash table.
+
+   </p><p>These mapping functions do not allow char-tables because a char-table
+is a sparse array whose nominal range of indices is very large.  To map
+over a char-table in a way that deals properly with its sparse nature,
+use the function <code>map-char-table</code> (see <a href="Char_002dTables.html#Char_002dTables">Char-Tables</a>).
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mapcar"></a><b>mapcar</b><var> function sequence<a name="index-mapcar-946"></a></var><br>
+<blockquote><p><a name="Definition-of-mapcar"></a><code>mapcar</code> applies <var>function</var> to each element of <var>sequence</var>
+in turn, and returns a list of the results.
+
+        </p><p>The argument <var>sequence</var> can be any kind of sequence except a
+char-table; that is, a list, a vector, a bool-vector, or a string.  The
+result is always a list.  The length of the result is the same as the
+length of <var>sequence</var>.  For example:
+
+     </p><pre class="example">          (mapcar 'car '((a b) (c d) (e f)))
+               ⇒ (a c e)
+          (mapcar '1+ [1 2 3])
+               ⇒ (2 3 4)
+          (mapcar 'string "abc")
+               ⇒ ("a" "b" "c")
+          
+          ;; <span class="roman">Call each function in </span><code>my-hooks</code><span class="roman">.</span>
+          (mapcar 'funcall my-hooks)
+          
+          (defun mapcar* (function &amp;rest args)
+            "Apply FUNCTION to successive cars of all ARGS.
+          Return the list of results."
+            ;; <span class="roman">If no list is exhausted,</span>
+            (if (not (memq nil args))
+                ;; <span class="roman">apply function to cars.</span>
+                (cons (apply function (mapcar 'car args))
+                      (apply 'mapcar* function
+                             ;; <span class="roman">Recurse for rest of elements.</span>
+                             (mapcar 'cdr args)))))
+          
+          (mapcar* 'cons '(a b c) '(1 2 3 4))
+               ⇒ ((a . 1) (b . 2) (c . 3))
+</pre>
+        </blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mapcan"></a><b>mapcan</b><var> function sequence<a name="index-mapcan-947"></a></var><br>
+<blockquote><p>This function applies <var>function</var> to each element of
+<var>sequence</var>, like <code>mapcar</code>, but instead of collecting the
+results into a list, it returns a single list with all the elements of
+the results (which must be lists), by altering the results (using
+<code>nconc</code>; see <a href="Rearrangement.html#Rearrangement">Rearrangement</a>).  Like with <code>mapcar</code>,
+<var>sequence</var> can be of any type except a char-table.
+
+     </p><pre class="example">          ;; <span class="roman">Contrast this:</span>
+          (mapcar 'list '(a b c d))
+               ⇒ ((a) (b) (c) (d))
+          ;; <span class="roman">with this:</span>
+          (mapcan 'list '(a b c d))
+               ⇒ (a b c d)
+</pre>
+        </blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mapc"></a><b>mapc</b><var> function sequence<a name="index-mapc-948"></a></var><br>
+<blockquote><p><code>mapc</code> is like <code>mapcar</code> except that <var>function</var> is used for
+side-effects only—the values it returns are ignored, not collected
+into a list.  <code>mapc</code> always returns <var>sequence</var>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mapconcat"></a><b>mapconcat</b><var> function sequence separator<a name="index-mapconcat-949"></a></var><br>
+<blockquote><p><code>mapconcat</code> applies <var>function</var> to each element of
+<var>sequence</var>; the results, which must be sequences of characters
+(strings, vectors, or lists), are concatenated into a single string
+return value.  Between each pair of result sequences, <code>mapconcat</code>
+inserts the characters from <var>separator</var>, which also must be a
+string, or a vector or list of characters.  See <a href="Sequences-Arrays-Vectors.html#Sequences-Arrays-Vectors">Sequences Arrays Vectors</a>.
+
+        </p><p>The argument <var>function</var> must be a function that can take one
+argument and returns a sequence of characters: a string, a vector, or
+a list.  The argument <var>sequence</var> can be any kind of sequence
+except a char-table; that is, a list, a vector, a bool-vector, or a
+string.
+
+     </p><pre class="example">          (mapconcat 'symbol-name
+                     '(The cat in the hat)
+                     " ")
+               ⇒ "The cat in the hat"
+          
+          (mapconcat (function (lambda (x) (format "%c" (1+ x))))
+                     "HAL-8000"
+                     "")
+               ⇒ "IBM.9111"
+</pre>
+        </blockquote></div>
+
+   
+
+</body></html>

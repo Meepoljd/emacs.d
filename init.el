@@ -1,7 +1,6 @@
 ;;; 一些个人常用的Emacs配置
 ;;; 参考https://huadeyu.tech/tools/emacs-setup-notes.html#orgf474189
 ;;; Code:
-
 (require 'package)
 (setq package-enable-at-startup nil)
 ;; 使用清华镜像
@@ -16,6 +15,10 @@
   (require 'use-package))
 (setq use-package-verbose t)
 (setq use-package-always-ensure t)
+;;
+(use-package exec-path-from-shell
+  :ensure t
+  :config (exec-path-from-shell-initialize))
 ;; 编码相关
 (prefer-coding-system 'utf-8)
 (setenv "LANG" "en_US.UTF-8")
@@ -83,31 +86,16 @@
                     :weight 'medium
                     :width 'medium)
 
-(if (display-graphic-p)
-    (dolist (charset '(kana han symbol cjk-misc bopomofo))
-      (set-fontset-font (frame-parameter nil 'font)
-                        charset (font-spec :family "Microsoft Yahei"
-                                           :size 14))))
 ;; 加载其他用户配置
 (setq custom-file "~/.emacs.d/.custom.el")
 (load custom-file t)
 ;; 主题配置
-(use-package 'solarized-theme)
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/pkg/themes"))
-(require 'color-theme-solarized)
-(color-theme-solarized)
-
-;;
-(use-package doom-modeline
-             :ensure t
-             :hook (after-init . doom-modeline-mode))
-;; auto-complete
-(use-package auto-compile
-             :init (setq load-prefer-newer t)
-             :config
-             (progn
-               (auto-compile-on-load-mode)
-               (auto-compile-on-save-mode)))
+(use-package solarized-theme)
+(load-theme 'solarized-light t)
+;; company
+(use-package company)
+(add-hook 'after-init-hook 'global-company-mode)
+(global-set-key (kbd "TAB") 'indent-for-tab-command)
 ;; undo tree
 (use-package undo-tree
              :config
@@ -136,12 +124,10 @@
              :config (autopair-global-mode))
 
 ;; neotree
-(use-package all-the-icons)
 (use-package neotree
              :config
              (progn
                (setq neo-smart-open t)
-               (setq neo-theme (if (display-graphic-p) 'icons 'arrow))
                (setq neo-window-fixed-size nil)
                (setq-default neo-show-hidden-files t)))
 ;; git
@@ -177,7 +163,7 @@
              :config
              (progn
                )
-             :bind  (("C-i" . helm-swoop)
+             :bind  (("C-s" . helm-swoop)
                      ("C-x C-f" . helm-find-files)
                      ("C-x b" . helm-buffers-list)
                      ("M-y" . helm-show-kill-ring)
@@ -234,37 +220,12 @@
             (signal 'quit "user quit!")
           (cdr (assoc result rmap))))
     nil))
-;; fix me mode
-(add-to-list 'load-path (expand-file-name "~/.emacs.d/pkg/vendors"))
-(require 'fixme-mode)
-(defvar my-highlight-words
-  '("FIXME" "TODO" "BUG"))
-;; Ensure that the variable exists.
-(defvar wcheck-language-data nil)
-(push '("FIXME"
-        (program . (lambda (strings)
-                     (let (found)
-                       (dolist (word my-highlight-words found)
-                         (when (member word strings)
-                           (push word found))))))
-        (face . highlight)
-        (read-or-skip-faces
-         (nil)))
-      wcheck-language-data)
-(fixme-mode 1)
 ;; dash
 (use-package helm-dash
              :config
              (progn
                (setq helm-dash-browser-func 'eww)
                (setq helm-dash-docsets-path (expand-file-name "~/.emacs.d/docsets"))
-
-               (helm-dash-activate-docset "Go")
-               (helm-dash-activate-docset "Python 3")
-               (helm-dash-activate-docset "CMake")
-               (helm-dash-activate-docset "Bash")
-               (helm-dash-activate-docset "Django")
-               (helm-dash-activate-docset "Redis")
                (helm-dash-activate-docset "Emacs Lisp")
                ))
 ;; markdown
@@ -277,3 +238,7 @@
                     ("\\.md\\'" . markdown-mode)
                     ("\\.markdown\\'" . markdown-mode))
              :init (setq markdown-command "multimarkdown"))
+;; leetcode
+(use-package leetcode)
+(setq leetcode-prefer-language "java")
+(setq leetcode-prefer-sql "mysql")

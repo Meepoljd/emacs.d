@@ -1,0 +1,137 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Word Motion</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Word-Motion"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Buffer-End-Motion.html#Buffer-End-Motion">Buffer End Motion</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Character-Motion.html#Character-Motion">Character Motion</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Motion.html#Motion">Motion</a>
+
+</p></div>
+
+<h4 class="subsection">30.2.2 Motion by Words</h4>
+
+<p>The functions for parsing words described below use the syntax table
+and <code>char-script-table</code> to decide whether a given character is
+part of a word.  See <a href="Syntax-Tables.html#Syntax-Tables">Syntax Tables</a>, and see <a href="Character-Properties.html#Character-Properties">Character Properties</a>.
+
+</p><div class="defun">
+— Command: <a class="dashAnchor" name="//apple_ref/Command/forward%2Dword"></a><b>forward-word</b><var> &amp;optional count<a name="index-forward_002dword-3322"></a></var><br>
+<blockquote><p>This function moves point forward <var>count</var> words (or backward if
+<var>count</var> is negative).  If <var>count</var> is omitted or <code>nil</code>, it
+defaults to 1.  In an interactive call, <var>count</var> is specified by
+the numeric prefix argument.
+
+        </p><p>“Moving one word” means moving until point crosses a
+word-constituent character, which indicates the beginning of a word,
+and then continue moving until the word ends.  By default, characters
+that begin and end words, known as <dfn>word boundaries</dfn>, are defined
+by the current buffer's syntax table (see <a href="Syntax-Class-Table.html#Syntax-Class-Table">Syntax Class Table</a>), but
+modes can override that by setting up a suitable
+<code>find-word-boundary-function-table</code>, described below.  Characters
+that belong to different scripts (as defined by
+<code>char-script-table</code>), also define a word boundary
+(see <a href="Character-Properties.html#Character-Properties">Character Properties</a>).  In any case, this function cannot
+move point past the boundary of the accessible portion of the buffer,
+or across a field boundary (see <a href="Fields.html#Fields">Fields</a>).  The most common case of
+a field boundary is the end of the prompt in the minibuffer.
+
+        </p><p>If it is possible to move <var>count</var> words, without being stopped
+prematurely by the buffer boundary or a field boundary, the value is
+<code>t</code>.  Otherwise, the return value is <code>nil</code> and point stops at
+the buffer boundary or field boundary.
+
+        </p><p>If <code>inhibit-field-text-motion</code> is non-<code>nil</code>,
+this function ignores field boundaries.
+
+        </p></blockquote></div>
+
+<div class="defun">
+— Command: <a class="dashAnchor" name="//apple_ref/Command/backward%2Dword"></a><b>backward-word</b><var> &amp;optional count<a name="index-backward_002dword-3323"></a></var><br>
+<blockquote><p>This function is just like <code>forward-word</code>, except that it moves
+backward until encountering the front of a word, rather than forward. 
+</p></blockquote></div>
+
+<div class="defun">
+— User Option: <a class="dashAnchor" name="//apple_ref/Option/words%2Dinclude%2Descapes"></a><b>words-include-escapes</b><var><a name="index-words_002dinclude_002descapes-3324"></a></var><br>
+<blockquote><!-- Emacs 19 feature -->
+        <p>This variable affects the behavior of <code>forward-word</code> and
+<code>backward-word</code>, and everything that uses them.  If it is
+non-<code>nil</code>, then characters in the escape and character-quote
+syntax classes count as part of words.  Otherwise, they do not. 
+</p></blockquote></div>
+
+<div class="defun">
+— Variable: <a class="dashAnchor" name="//apple_ref/Variable/inhibit%2Dfield%2Dtext%2Dmotion"></a><b>inhibit-field-text-motion</b><var><a name="index-inhibit_002dfield_002dtext_002dmotion-3325"></a></var><br>
+<blockquote><p>If this variable is non-<code>nil</code>, certain motion functions including
+<code>forward-word</code>, <code>forward-sentence</code>, and
+<code>forward-paragraph</code> ignore field boundaries. 
+</p></blockquote></div>
+
+<div class="defun">
+— Variable: <a class="dashAnchor" name="//apple_ref/Variable/find%2Dword%2Dboundary%2Dfunction%2Dtable"></a><b>find-word-boundary-function-table</b><var><a name="index-find_002dword_002dboundary_002dfunction_002dtable-3326"></a></var><br>
+<blockquote><p>This variable affects the behavior of <code>forward-word</code> and
+<code>backward-word</code>, and everything that uses them.  Its value is a
+char-table (see <a href="Char_002dTables.html#Char_002dTables">Char-Tables</a>) of functions to search for word
+boundaries.  If a character has a non-<code>nil</code> entry in this table,
+then when a word starts or ends with that character, the corresponding
+function will be called with 2 arguments: <var>pos</var> and <var>limit</var>. 
+The function should return the position of the other word boundary. 
+Specifically, if <var>pos</var> is smaller than <var>limit</var>, then <var>pos</var>
+is at the beginning of a word, and the function should return the
+position after the last character of the word; otherwise, <var>pos</var> is
+at the last character of a word, and the function should return the
+position of that word's first character. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/forward%2Dword%2Dstrictly"></a><b>forward-word-strictly</b><var> &amp;optional count<a name="index-forward_002dword_002dstrictly-3327"></a></var><br>
+<blockquote><p>This function is like <code>forward-word</code>, but it is not affected by
+<code>find-word-boundary-function-table</code>.  Lisp programs that should
+not change behavior when word movement is modified by modes which set
+that table, such as <code>subword-mode</code>, should use this function
+instead of <code>forward-word</code>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/backward%2Dword%2Dstrictly"></a><b>backward-word-strictly</b><var> &amp;optional count<a name="index-backward_002dword_002dstrictly-3328"></a></var><br>
+<blockquote><p>This function is like <code>backward-word</code>, but it is not affected by
+<code>find-word-boundary-function-table</code>.  Like with
+<code>forward-word-strictly</code>, use this function instead of
+<code>backward-word</code> when movement by words should only consider
+syntax tables. 
+</p></blockquote></div>
+
+   
+
+</body></html>

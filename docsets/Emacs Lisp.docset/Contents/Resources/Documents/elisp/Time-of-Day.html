@@ -1,0 +1,123 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Time of Day</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Time-of-Day"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Time-Zone-Rules.html#Time-Zone-Rules">Time Zone Rules</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="User-Identification.html#User-Identification">User Identification</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="System-Interface.html#System-Interface">System Interface</a>
+
+</p></div>
+
+<h3 class="section">40.5 Time of Day</h3>
+
+<p><a name="index-time-of-day-5085"></a>
+  This section explains how to determine the current time and time
+zone.
+
+   </p><p><a name="index-epoch-5086"></a>  Most of these functions represent time as a list of four integers
+<code>(</code><var>sec-high</var> <var>sec-low</var> <var>microsec</var> <var>picosec</var><code>)</code>. 
+This represents the number of seconds from the <dfn>epoch</dfn> (January
+1, 1970 at 00:00 UTC), using the formula:
+<var>high</var> * 2**16 + <var>low</var> + <var>micro</var> * 10**−6 +
+<var>pico</var> * 10**−12. 
+The return value of <code>current-time</code> represents time using this
+form, as do the timestamps in the return values of other functions
+such as <code>file-attributes</code> (see <a href="Definition-of-file_002dattributes.html#Definition-of-file_002dattributes">Definition of file-attributes</a>).  In some cases, functions may return two- or
+three-element lists, with omitted <var>microsec</var> and <var>picosec</var>
+components defaulting to zero.
+
+   </p><p><a name="index-time-value-5087"></a>  Function arguments, e.g., the <var>time</var> argument to
+<code>current-time-string</code>, accept a more-general <dfn>time value</dfn>
+format, which can be a list of integers as above, or a single number
+for seconds since the epoch, or <code>nil</code> for the current time.  You
+can convert a time value into a human-readable string using
+<code>current-time-string</code> and <code>format-time-string</code>, into a list
+of integers using <code>seconds-to-time</code>, and into other forms using
+<code>decode-time</code> and <code>float-time</code>.  These functions are
+described in the following sections.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/current%2Dtime%2Dstring"></a><b>current-time-string</b><var> &amp;optional time zone<a name="index-current_002dtime_002dstring-5088"></a></var><br>
+<blockquote><p>This function returns the current time and date as a human-readable
+string.  The format does not vary for the initial part of the string,
+which contains the day of week, month, day of month, and time of day
+in that order: the number of characters used for these fields is
+always the same, so you can reliably
+use <code>substring</code> to extract them.  You should count
+characters from the beginning of the string rather than from the end,
+as the year might not have exactly four digits, and additional
+information may some day be added at the end.
+
+        </p><p>The argument <var>time</var>, if given, specifies a time to format,
+instead of the current time.  The optional argument <var>zone</var>
+defaults to the current time zone rule.  See <a href="Time-Zone-Rules.html#Time-Zone-Rules">Time Zone Rules</a>.
+
+     </p><pre class="example">          (current-time-string)
+               ⇒ "Wed Oct 14 22:21:05 1987"
+</pre>
+        </blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/current%2Dtime"></a><b>current-time</b><var><a name="index-current_002dtime-5089"></a></var><br>
+<blockquote><p>This function returns the current time, represented as a list of four
+integers <code>(</code><var>sec-high</var> <var>sec-low</var> <var>microsec</var> <var>picosec</var><code>)</code>. 
+These integers have trailing zeros on systems that return time with
+lower resolutions.  On all current machines <var>picosec</var> is a
+multiple of 1000, but this may change as higher-resolution clocks
+become available. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/float%2Dtime"></a><b>float-time</b><var> &amp;optional time<a name="index-float_002dtime-5090"></a></var><br>
+<blockquote><p>This function returns the current time as a floating-point number of
+seconds since the epoch.  The optional argument <var>time</var>, if
+given, specifies a time to convert instead of the current time.
+
+        </p><p><em>Warning</em>: Since the result is floating point, it may not be
+exact.  Do not use this function if precise time stamps are required.
+
+        </p><p><code>time-to-seconds</code> is an alias for this function. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/seconds%2Dto%2Dtime"></a><b>seconds-to-time</b><var> time<a name="index-seconds_002dto_002dtime-5091"></a></var><br>
+<blockquote><p>This function converts a time value to list-of-integer form. 
+For example, if <var>time</var> is a number, <code>(time-to-seconds
+(seconds-to-time </code><var>time</var><code>))</code> equals the number unless overflow
+or rounding errors occur. 
+</p></blockquote></div>
+
+   
+
+</body></html>

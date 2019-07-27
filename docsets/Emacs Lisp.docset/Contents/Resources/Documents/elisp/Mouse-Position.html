@@ -1,0 +1,129 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Mouse Position</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Mouse-Position"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Pop_002dUp-Menus.html#Pop_002dUp-Menus">Pop-Up Menus</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Mouse-Tracking.html#Mouse-Tracking">Mouse Tracking</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Frames.html#Frames">Frames</a>
+
+</p></div>
+
+<h3 class="section">29.16 Mouse Position</h3>
+
+<p><a name="index-mouse-position-3228"></a><a name="index-position-of-mouse-3229"></a>
+  The functions <code>mouse-position</code> and <code>set-mouse-position</code>
+give access to the current position of the mouse.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mouse%2Dposition"></a><b>mouse-position</b><var><a name="index-mouse_002dposition-3230"></a></var><br>
+<blockquote><p>This function returns a description of the position of the mouse.  The
+value looks like <code>(</code><var>frame</var> <var>x</var><code> . </code><var>y</var><code>)</code>, where <var>x</var>
+and <var>y</var> are integers giving the (possibly rounded) position in
+multiples of the default character size of <var>frame</var> (see <a href="Frame-Font.html#Frame-Font">Frame Font</a>) relative to the native position of <var>frame</var> (see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>). 
+</p></blockquote></div>
+
+<div class="defun">
+— Variable: <a class="dashAnchor" name="//apple_ref/Variable/mouse%2Dposition%2Dfunction"></a><b>mouse-position-function</b><var><a name="index-mouse_002dposition_002dfunction-3231"></a></var><br>
+<blockquote><p>If non-<code>nil</code>, the value of this variable is a function for
+<code>mouse-position</code> to call.  <code>mouse-position</code> calls this
+function just before returning, with its normal return value as the
+sole argument, and it returns whatever this function returns to it.
+
+        </p><p>This abnormal hook exists for the benefit of packages like
+<samp><span class="file">xt-mouse.el</span></samp> that need to do mouse handling at the Lisp level. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/set%2Dmouse%2Dposition"></a><b>set-mouse-position</b><var> frame x y<a name="index-set_002dmouse_002dposition-3232"></a></var><br>
+<blockquote><p>This function <dfn>warps the mouse</dfn> to position <var>x</var>, <var>y</var> in
+frame <var>frame</var>.  The arguments <var>x</var> and <var>y</var> are integers,
+giving the position in multiples of the default character size of
+<var>frame</var> (see <a href="Frame-Font.html#Frame-Font">Frame Font</a>) relative to the native position of
+<var>frame</var> (see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>).
+
+        </p><p>The resulting mouse position is constrained to the native frame of
+<var>frame</var>.  If <var>frame</var> is not visible, this function does nothing. 
+The return value is not significant. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mouse%2Dpixel%2Dposition"></a><b>mouse-pixel-position</b><var><a name="index-mouse_002dpixel_002dposition-3233"></a></var><br>
+<blockquote><p>This function is like <code>mouse-position</code> except that it returns
+coordinates in units of pixels rather than units of characters. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/set%2Dmouse%2Dpixel%2Dposition"></a><b>set-mouse-pixel-position</b><var> frame x y<a name="index-set_002dmouse_002dpixel_002dposition-3234"></a></var><br>
+<blockquote><p>This function warps the mouse like <code>set-mouse-position</code> except that
+<var>x</var> and <var>y</var> are in units of pixels rather than units of
+characters.
+
+        </p><p>The resulting mouse position is not constrained to the native frame of
+<var>frame</var>.  If <var>frame</var> is not visible, this function does nothing. 
+The return value is not significant. 
+</p></blockquote></div>
+
+   <p>On a graphical terminal the following two functions allow the absolute
+position of the mouse cursor to be retrieved and set.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mouse%2Dabsolute%2Dpixel%2Dposition"></a><b>mouse-absolute-pixel-position</b><var><a name="index-mouse_002dabsolute_002dpixel_002dposition-3235"></a></var><br>
+<blockquote><p>This function returns a cons cell (<var>x</var> . <var>y</var>) of the coordinates
+of the mouse cursor position in pixels, relative to a position (0, 0) of
+the selected frame's display. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/set%2Dmouse%2Dabsolute%2Dpixel%2Dposition"></a><b>set-mouse-absolute-pixel-position</b><var> x y<a name="index-set_002dmouse_002dabsolute_002dpixel_002dposition-3236"></a></var><br>
+<blockquote><p>This function moves the mouse cursor to the position (<var>x</var>, <var>y</var>). 
+The coordinates <var>x</var> and <var>y</var> are interpreted in pixels relative
+to a position (0, 0) of the selected frame's display. 
+</p></blockquote></div>
+
+   <p>The following function can tell whether the mouse cursor is currently
+visible on a frame:
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/frame%2Dpointer%2Dvisible%2Dp"></a><b>frame-pointer-visible-p</b><var> &amp;optional frame<a name="index-frame_002dpointer_002dvisible_002dp-3237"></a></var><br>
+<blockquote><p>This predicate function returns non-<code>nil</code> if the mouse pointer
+displayed on <var>frame</var> is visible; otherwise it returns <code>nil</code>. 
+<var>frame</var> omitted or <code>nil</code> means the selected frame.  This is
+useful when <code>make-pointer-invisible</code> is set to <code>t</code>: it
+allows you to know if the pointer has been hidden. 
+See <a href="../emacs/Mouse-Avoidance.html#Mouse-Avoidance">Mouse Avoidance</a>. 
+</p></blockquote></div>
+
+   
+
+</body></html>

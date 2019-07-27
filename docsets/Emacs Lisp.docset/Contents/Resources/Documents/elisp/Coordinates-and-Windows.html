@@ -1,0 +1,290 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Coordinates and Windows</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Coordinates-and-Windows"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Mouse-Window-Auto_002dselection.html#Mouse-Window-Auto_002dselection">Mouse Window Auto-selection</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Horizontal-Scrolling.html#Horizontal-Scrolling">Horizontal Scrolling</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Windows.html#Windows">Windows</a>
+
+</p></div>
+
+<h3 class="section">28.26 Coordinates and Windows</h3>
+
+<p><a name="index-frame_002drelative-coordinate-2852"></a><a name="index-coordinate_002c-relative-to-frame-2853"></a><a name="index-window-position-2854"></a>
+This section describes functions that report positions of and within a
+window.  Most of these functions report positions relative to an origin
+at the native position of the window's frame (see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>). 
+Some functions report positions relative to the origin of the display of
+the window's frame.  In any case, the origin has the coordinates (0, 0)
+and X and Y coordinates increase rightward and downward respectively.
+
+   </p><p>For the following functions, X and Y coordinates are reported in
+integer character units, i.e., numbers of lines and columns
+respectively.  On a graphical display, each “line” and “column”
+corresponds to the height and width of the default character specified by
+the frame's default font (see <a href="Frame-Font.html#Frame-Font">Frame Font</a>).
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dedges"></a><b>window-edges</b><var> &amp;optional window body absolute pixelwise<a name="index-window_002dedges-2855"></a></var><br>
+<blockquote><p>This function returns a list of the edge coordinates of <var>window</var>. 
+If <var>window</var> is omitted or <code>nil</code>, it defaults to the selected
+window.
+
+        </p><p>The return value has the form <code>(</code><var>left</var> <var>top</var> <var>right</var>
+<var>bottom</var><code>)</code>.  These list elements are, respectively, the X
+coordinate of the leftmost column occupied by the window, the Y
+coordinate of the topmost row, the X coordinate one column to the
+right of the rightmost column, and the Y coordinate one row down from
+the bottommost row.
+
+        </p><p>Note that these are the actual outer edges of the window, including any
+header line, mode line, scroll bar, fringes, window divider and display
+margins.  On a text terminal, if the window has a neighbor on its right,
+its right edge includes the separator line between the window and its
+neighbor.
+
+        </p><p>If the optional argument <var>body</var> is <code>nil</code>, this means to
+return the edges corresponding to the total size of <var>window</var>. 
+<var>body</var> non-<code>nil</code> means to return the edges of <var>window</var>'s
+body (aka text area).  If <var>body</var> is non-<code>nil</code>, <var>window</var>
+must specify a live window.
+
+        </p><p>If the optional argument <var>absolute</var> is <code>nil</code>, this means to
+return edges relative to the native position of <var>window</var>'s frame. 
+<var>absolute</var> non-<code>nil</code> means to return coordinates relative to
+the origin (0, 0) of <var>window</var>'s display.  On non-graphical systems
+this argument has no effect.
+
+        </p><p>If the optional argument <var>pixelwise</var> is <code>nil</code>, this means to
+return the coordinates in terms of the default character width and
+height of <var>window</var>'s frame (see <a href="Frame-Font.html#Frame-Font">Frame Font</a>), rounded if
+necessary.  <var>pixelwise</var> non-<code>nil</code> means to return the
+coordinates in pixels.  Note that the pixel specified by <var>right</var> and
+<var>bottom</var> is immediately outside of these edges.  If <var>absolute</var>
+is non-<code>nil</code>, <var>pixelwise</var> is implicitly non-<code>nil</code> too. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dbody%2Dedges"></a><b>window-body-edges</b><var> &amp;optional window<a name="index-window_002dbody_002dedges-2856"></a></var><br>
+<blockquote><p>This function returns the edges of <var>window</var>'s body (see <a href="Window-Sizes.html#Window-Sizes">Window Sizes</a>).  Calling <code>(window-body-edges window)</code> is equivalent to
+calling <code>(window-edges window t)</code>, see above. 
+</p></blockquote></div>
+
+<!-- The following two functions are confusing and hardly used. -->
+   <p>The following functions can be used to relate a set of
+frame-relative coordinates to a window:
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dat"></a><b>window-at</b><var> x y &amp;optional frame<a name="index-window_002dat-2857"></a></var><br>
+<blockquote><p>This function returns the live window at the coordinates <var>x</var> and
+<var>y</var> given in default character sizes (see <a href="Frame-Font.html#Frame-Font">Frame Font</a>) relative
+to the native position of <var>frame</var> (see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>).
+
+        </p><p>If there is no window at that position, the return value is <code>nil</code>. 
+If <var>frame</var> is omitted or <code>nil</code>, it defaults to the selected
+frame. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/coordinates%2Din%2Dwindow%2Dp"></a><b>coordinates-in-window-p</b><var> coordinates window<a name="index-coordinates_002din_002dwindow_002dp-2858"></a></var><br>
+<blockquote><p>This function checks whether a window <var>window</var> occupies the frame
+relative coordinates <var>coordinates</var>, and if so, which part of the
+window that is.  <var>window</var> should be a live window.
+
+        </p><p><var>coordinates</var> should be a cons cell of the form <code>(</code><var>x</var><code>
+. </code><var>y</var><code>)</code>, where <var>x</var> and <var>y</var> are given in default character
+sizes (see <a href="Frame-Font.html#Frame-Font">Frame Font</a>) relative to the native position of
+<var>window</var>'s frame (see <a href="Frame-Geometry.html#Frame-Geometry">Frame Geometry</a>).
+
+        </p><p>If there is no window at the specified position, the return value is
+<code>nil</code> .  Otherwise, the return value is one of the following:
+
+          </p><dl>
+<dt><code>(</code><var>relx</var><code> . </code><var>rely</var><code>)</code></dt><dd>The coordinates are inside <var>window</var>.  The numbers <var>relx</var> and
+<var>rely</var> are the equivalent window-relative coordinates for the
+specified position, counting from 0 at the top left corner of the
+window.
+
+          <br></dd><dt><code>mode-line</code></dt><dd>The coordinates are in the mode line of <var>window</var>.
+
+          <br></dd><dt><code>header-line</code></dt><dd>The coordinates are in the header line of <var>window</var>.
+
+          <br></dd><dt><code>right-divider</code></dt><dd>The coordinates are in the divider separating <var>window</var> from a
+window on the right.
+
+          <br></dd><dt><code>bottom-divider</code></dt><dd>The coordinates are in the divider separating <var>window</var> from a
+window beneath.
+
+          <br></dd><dt><code>vertical-line</code></dt><dd>The coordinates are in the vertical line between <var>window</var> and its
+neighbor to the right.  This value occurs only if the window doesn't
+have a scroll bar; positions in a scroll bar are considered outside the
+window for these purposes.
+
+          <br></dd><dt><code>left-fringe</code></dt><dt><code>right-fringe</code></dt><dd>The coordinates are in the left or right fringe of the window.
+
+          <br></dd><dt><code>left-margin</code></dt><dt><code>right-margin</code></dt><dd>The coordinates are in the left or right margin of the window.
+
+          <br></dd><dt><code>nil</code></dt><dd>The coordinates are not in any part of <var>window</var>. 
+</dd></dl>
+
+        <p>The function <code>coordinates-in-window-p</code> does not require a frame as
+argument because it always uses the frame that <var>window</var> is on. 
+</p></blockquote></div>
+
+   <p>The following functions return window positions in pixels, rather
+than character units.  Though mostly useful on graphical displays,
+they can also be called on text terminals, where the screen area of
+each text character is taken to be one pixel.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dpixel%2Dedges"></a><b>window-pixel-edges</b><var> &amp;optional window<a name="index-window_002dpixel_002dedges-2859"></a></var><br>
+<blockquote><p>This function returns a list of pixel coordinates for the edges of
+<var>window</var>.  Calling <code>(window-pixel-edges window)</code> is equivalent
+to calling <code>(window-edges window nil nil t)</code>, see above. 
+</p></blockquote></div>
+
+<!-- The following two functions are confusing and hardly used. -->
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dbody%2Dpixel%2Dedges"></a><b>window-body-pixel-edges</b><var> &amp;optional window<a name="index-window_002dbody_002dpixel_002dedges-2860"></a></var><br>
+<blockquote><p>This function returns the pixel edges of <var>window</var>'s body.  Calling
+<code>(window-body-pixel-edges window)</code> is equivalent to calling
+<code>(window-edges window t nil t)</code>, see above. 
+</p></blockquote></div>
+
+   <p>The following functions return window positions in pixels, relative to
+the origin of the display screen rather than that of the frame:
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dabsolute%2Dpixel%2Dedges"></a><b>window-absolute-pixel-edges</b><var> &amp;optional window<a name="index-window_002dabsolute_002dpixel_002dedges-2861"></a></var><br>
+<blockquote><p>This function returns the pixel coordinates of <var>window</var> relative to
+an origin at (0, 0) of the display of <var>window</var>'s frame.  Calling
+<code>(window-absolute-pixel-edges)</code> is equivalent to calling
+<code>(window-edges window nil t t)</code>, see above. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dabsolute%2Dbody%2Dpixel%2Dedges"></a><b>window-absolute-body-pixel-edges</b><var> &amp;optional window<a name="index-window_002dabsolute_002dbody_002dpixel_002dedges-2862"></a></var><br>
+<blockquote><p>This function returns the pixel coordinates of <var>window</var>'s body
+relative to an origin at (0, 0) of the display of <var>window</var>'s frame. 
+Calling <code>(window-absolute-body-pixel-edges window)</code> is equivalent
+to calling <code>(window-edges window t t t)</code>, see above.
+
+        </p><p>Combined with <code>set-mouse-absolute-pixel-position</code>, this function
+can be used to move the mouse pointer to an arbitrary buffer position
+visible in some window:
+
+     </p><pre class="example">          (let ((edges (window-absolute-body-pixel-edges))
+                (position (pos-visible-in-window-p nil nil t)))
+            (set-mouse-absolute-pixel-position
+             (+ (nth 0 edges) (nth 0 position))
+             (+ (nth 1 edges) (nth 1 position))))
+</pre>
+        <p>On a graphical terminal this form “warps” the mouse cursor to the
+upper left corner of the glyph at the selected window's point.  A
+position calculated this way can be also used to show a tooltip window
+there. 
+</p></blockquote></div>
+
+   <p>The following function returns the screen coordinates of a buffer
+position visible in a window:
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dabsolute%2Dpixel%2Dposition"></a><b>window-absolute-pixel-position</b><var> &amp;optional position window<a name="index-window_002dabsolute_002dpixel_002dposition-2863"></a></var><br>
+<blockquote><p>If the buffer position <var>position</var> is visible in window <var>window</var>,
+this function returns the display coordinates of the upper/left corner
+of the glyph at <var>position</var>.  The return value is a cons of the X-
+and Y-coordinates of that corner, relative to an origin at (0, 0) of
+<var>window</var>'s display.  It returns <code>nil</code> if <var>position</var> is not
+visible in <var>window</var>.
+
+        </p><p><var>window</var> must be a live window and defaults to the selected
+window.  <var>position</var> defaults to the value of <code>window-point</code>
+of <var>window</var>.
+
+        </p><p>This means that in order to move the mouse pointer to the position of
+point in the selected window, it's sufficient to write:
+
+     </p><pre class="example">          (let ((position (window-absolute-pixel-position)))
+            (set-mouse-absolute-pixel-position
+             (car position) (cdr position)))
+</pre>
+        </blockquote></div>
+
+   <p>The following function returns the largest rectangle that can be
+inscribed in a window without covering text displayed in that window.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/window%2Dlargest%2Dempty%2Drectangle"></a><b>window-largest-empty-rectangle</b><var> &amp;optional window count min-width min-height positions left<a name="index-window_002dlargest_002dempty_002drectangle-2864"></a></var><br>
+<blockquote><p>This function calculates the dimensions of the largest empty rectangle
+that can be inscribed in the specified <var>window</var>'s text area. 
+<var>window</var> must be a live window and defaults to the selected one.
+
+        </p><p>The return value is a triple of the width and the start and end
+y-coordinates of the largest rectangle that can be inscribed into the
+empty space (space not displaying any text) of the text area of
+<var>window</var>.  No x-coordinates are returned by this function—any such
+rectangle is assumed to end at the right edge of <var>window</var>'s text
+area.  If no empty space can be found, the return value is <code>nil</code>.
+
+        </p><p>The optional argument <var>count</var>, if non-<code>nil</code>, specifies a
+maximum number of rectangles to return.  This means that the return
+value is a list of triples specifying rectangles with the largest
+rectangle first.  <var>count</var> can be also a cons cell whose car
+specifies the number of rectangles to return and whose <span class="sc">cdr</span>, if
+non-<code>nil</code>, states that all rectangles returned must be disjoint.
+
+        </p><p>The optional arguments <var>min-width</var> and <var>min-height</var>, if
+non-<code>nil</code>, specify the minimum width and height of any rectangle
+returned.
+
+        </p><p>The optional argument <var>positions</var>, if non-<code>nil</code>, is a cons cell
+whose <span class="sc">car</span> specifies the uppermost and whose <span class="sc">cdr</span> specifies the
+lowermost pixel position that must be covered by any rectangle returned. 
+These positions measure from the start of the text area of <var>window</var>.
+
+        </p><p>The optional argument <var>left</var>, if non-<code>nil</code>, means to return
+values suitable for buffers displaying right to left text.  In that
+case, any rectangle returned is assumed to start at the left edge of
+<var>window</var>'s text area.
+
+        </p><p>Note that this function has to retrieve the dimensions of each line of
+<var>window</var>'s glyph matrix via <code>window-lines-pixel-dimensions</code>
+(see <a href="Size-of-Displayed-Text.html#Size-of-Displayed-Text">Size of Displayed Text</a>).  Hence, this function may also return
+<code>nil</code> when the current glyph matrix of <var>window</var> is not
+up-to-date. 
+</p></blockquote></div>
+
+   
+
+</body></html>

@@ -1,0 +1,96 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Mutexes</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Mutexes"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Condition-Variables.html#Condition-Variables">Condition Variables</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Basic-Thread-Functions.html#Basic-Thread-Functions">Basic Thread Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Threads.html#Threads">Threads</a>
+
+</p></div>
+
+<h3 class="section">37.2 Mutexes</h3>
+
+<p>A <dfn>mutex</dfn> is an exclusive lock.  At any moment, zero or one
+threads may own a mutex.  If a thread attempts to acquire a mutex, and
+the mutex is already owned by some other thread, then the acquiring
+thread will block until the mutex becomes available.
+
+   </p><p>Emacs Lisp mutexes are of a type called <dfn>recursive</dfn>, which means
+that a thread can re-acquire a mutex it owns any number of times.  A
+mutex keeps a count of how many times it has been acquired, and each
+acquisition of a mutex must be paired with a release.  The last
+release by a thread of a mutex reverts it to the unowned state,
+potentially allowing another thread to acquire the mutex.
+
+</p><div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mutexp"></a><b>mutexp</b><var> object<a name="index-mutexp-4244"></a></var><br>
+<blockquote><p>This function returns <code>t</code> if <var>object</var> represents an Emacs
+mutex, <code>nil</code> otherwise. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/make%2Dmutex"></a><b>make-mutex</b><var> &amp;optional name<a name="index-make_002dmutex-4245"></a></var><br>
+<blockquote><p>Create a new mutex and return it.  If <var>name</var> is specified, it is a
+name given to the mutex.  It must be a string.  The name is for
+debugging purposes only; it has no meaning to Emacs. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mutex%2Dname"></a><b>mutex-name</b><var> mutex<a name="index-mutex_002dname-4246"></a></var><br>
+<blockquote><p>Return the name of <var>mutex</var>, as specified to <code>make-mutex</code>. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mutex%2Dlock"></a><b>mutex-lock</b><var> mutex<a name="index-mutex_002dlock-4247"></a></var><br>
+<blockquote><p>This will block until this thread acquires <var>mutex</var>, or until this
+thread is signaled using <code>thread-signal</code>.  If <var>mutex</var> is
+already owned by this thread, this simply returns. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/mutex%2Dunlock"></a><b>mutex-unlock</b><var> mutex<a name="index-mutex_002dunlock-4248"></a></var><br>
+<blockquote><p>Release <var>mutex</var>.  If <var>mutex</var> is not owned by this thread, this
+will signal an error. 
+</p></blockquote></div>
+
+<div class="defun">
+— Macro: <a class="dashAnchor" name="//apple_ref/Macro/with%2Dmutex"></a><b>with-mutex</b><var> mutex body<small class="dots">...</small><a name="index-with_002dmutex-4249"></a></var><br>
+<blockquote><p>This macro is the simplest and safest way to evaluate forms while
+holding a mutex.  It acquires <var>mutex</var>, invokes <var>body</var>, and
+then releases <var>mutex</var>.  It returns the result of <var>body</var>. 
+</p></blockquote></div>
+
+   
+
+</body></html>

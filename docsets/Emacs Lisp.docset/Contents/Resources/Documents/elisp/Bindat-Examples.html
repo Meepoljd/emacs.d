@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Bindat Examples</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Bindat-Examples"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Bindat-Functions.html#Bindat-Functions">Bindat Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Byte-Packing.html#Byte-Packing">Byte Packing</a>
+
+</div>
+
+<h4 class="subsection">38.20.3 Examples of Byte Unpacking and Packing</h4>
+
+<!-- FIXME?  This seems a very long example for something that is not used -->
+<!-- very often.  As of 25.2, gdb-mi.el is the only user of bindat.el in Emacs. -->
+<!-- Maybe one or both of these examples should just be moved to the -->
+<!-- commentary of bindat.el. -->
+<p>Here are two complete examples that use bindat.el. 
+The first shows simple byte packing:
+
+<pre class="lisp">     (require 'bindat)
+     
+     (defun rfc868-payload ()
+       (bindat-pack
+        '((now-hi u16)
+          (now-lo u16))
+        ;; Emacs uses Unix epoch, while RFC868 epoch
+        ;; is 1900-01-01 00:00:00, which is 2208988800
+        ;; (or #x83aa7e80) seconds more.
+        (let ((now (time-add nil '(#x83aa #x7e80))))
+          `((now-hi . ,(car now))
+            (now-lo . ,(cadr now))))))
+     
+     (let ((s (rfc868-payload)))
+       (list (multibyte-string-p s)
+             (mapconcat (lambda (byte)
+                          (format "%02x" byte))
+                        s " ")
+             (current-time-string)))
+          &rArr; (nil "dc 6d 17 01" "Fri Mar 10 13:13:53 2017")
+</pre>
+   <p>The following is an example of defining and unpacking a complex
+structure.  Consider the following C structures:
+
+<pre class="example">     struct header {
+         unsigned long    dest_ip;
+         unsigned long    src_ip;
+         unsigned short   dest_port;
+         unsigned short   src_port;
+     };
+     
+     struct data {
+         unsigned char    type;
+         unsigned char    opcode;
+         unsigned short   length;  /* in network byte order  */
+         unsigned char    id[8];   /* null-terminated string  */
+         unsigned char    data[/* (length + 3) &amp; ~3 */];
+     };
+     
+     struct packet {
+         struct header    header;
+         unsigned long    counters[2];  /* in little endian order  */
+         unsigned char    items;
+         unsigned char    filler[3];
+         struct data      item[/* items */];
+     
+     };
+</pre>
+   <p>The corresponding data layout specification is:
+
+<pre class="lisp">     (setq header-spec
+           '((dest-ip   ip)
+             (src-ip    ip)
+             (dest-port u16)
+             (src-port  u16)))
+     
+     (setq data-spec
+           '((type      u8)
+             (opcode    u8)
+             (length    u16)  ; network byte order
+             (id        strz 8)
+             (data      vec (length))
+             (align     4)))
+     
+     (setq packet-spec
+           '((header    struct header-spec)
+             (counters  vec 2 u32r)   ; little endian order
+             (items     u8)
+             (fill      3)
+             (item      repeat (items)
+                        (struct data-spec))))
+</pre>
+   <p>A binary data representation is:
+
+<pre class="lisp">     (setq binary-data
+           [ 192 168 1 100 192 168 1 101 01 28 21 32
+             160 134 1 0 5 1 0 0 2 0 0 0
+             2 3 0 5 ?A ?B ?C ?D ?E ?F 0 0 1 2 3 4 5 0 0 0
+             1 4 0 7 ?B ?C ?D ?E ?F ?G 0 0 6 7 8 9 10 11 12 0 ])
+</pre>
+   <p>The corresponding decoded structure is:
+
+<pre class="lisp">     (setq decoded (bindat-unpack packet-spec binary-data))
+          &rArr;
+     ((header
+       (dest-ip   . [192 168 1 100])
+       (src-ip    . [192 168 1 101])
+       (dest-port . 284)
+       (src-port  . 5408))
+      (counters . [100000 261])
+      (items . 2)
+      (item ((data . [1 2 3 4 5])
+             (id . "ABCDEF")
+             (length . 5)
+             (opcode . 3)
+             (type . 2))
+            ((data . [6 7 8 9 10 11 12])
+             (id . "BCDEFG")
+             (length . 7)
+             (opcode . 4)
+             (type . 1))))
+</pre>
+   <p>An example of fetching data from this structure:
+
+<pre class="lisp">     (bindat-get-field decoded 'item 1 'id)
+          &rArr; "BCDEFG"
+</pre>
+   <!-- *- mode: texinfo; coding: utf-8 -*- -->
+<!-- This is part of the GNU Emacs Lisp Reference Manual. -->
+<!-- Copyright (C) 1990-1995, 1998-2018 Free Software Foundation, Inc. -->
+<!-- See the file elisp.texi for copying conditions. -->
+   </body></html>
+

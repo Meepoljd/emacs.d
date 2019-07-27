@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+
+<html lang="en">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Management Parameters</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Management-Parameters"></a>
+<p>
+Next:&nbsp;<a rel="next" accesskey="n" href="Cursor-Parameters.html#Cursor-Parameters">Cursor Parameters</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Mouse-Dragging-Parameters.html#Mouse-Dragging-Parameters">Mouse Dragging Parameters</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Window-Frame-Parameters.html#Window-Frame-Parameters">Window Frame Parameters</a>
+
+</div>
+
+<h5 class="subsubsection">29.4.3.8 Window Management Parameters</h5>
+
+<p><a name="index-window-manager-interaction_002c-and-frame-parameters-3112"></a>
+  The following frame parameters control various aspects of the frame's
+interaction with the window manager or window system.  They have no
+effect on text terminals.
+
+     
+<a name="index-visibility_0040r_007b_002c-a-frame-parameter_007d-3113"></a>
+<dl><dt><code>visibility</code><dd>The state of visibility of the frame.  There are three possibilities:
+<code>nil</code> for invisible, <code>t</code> for visible, and <code>icon</code> for
+iconified.  See <a href="Visibility-of-Frames.html#Visibility-of-Frames">Visibility of Frames</a>.
+
+     <p><a name="index-auto_002draise_0040r_007b_002c-a-frame-parameter_007d-3114"></a><br><dt><code>auto-raise</code><dd>If non-<code>nil</code>, Emacs automatically raises the frame when it is
+selected.  Some window managers do not allow this.
+
+     <p><a name="index-auto_002dlower_0040r_007b_002c-a-frame-parameter_007d-3115"></a><br><dt><code>auto-lower</code><dd>If non-<code>nil</code>, Emacs automatically lowers the frame when it is
+deselected.  Some window managers do not allow this.
+
+     <p><a name="index-icon_002dtype_0040r_007b_002c-a-frame-parameter_007d-3116"></a><br><dt><code>icon-type</code><dd>The type of icon to use for this frame.  If the value is a string,
+that specifies a file containing a bitmap to use; <code>nil</code> specifies
+no icon (in which case the window manager decides what to show); any
+other non-<code>nil</code> value specifies the default Emacs icon.
+
+     <p><a name="index-icon_002dname_0040r_007b_002c-a-frame-parameter_007d-3117"></a><br><dt><code>icon-name</code><dd>The name to use in the icon for this frame, when and if the icon
+appears.  If this is <code>nil</code>, the frame's title is used.
+
+     <p><a name="index-window_002did_0040r_007b_002c-a-frame-parameter_007d-3118"></a><br><dt><code>window-id</code><dd>The ID number which the graphical display uses for this frame.  Emacs
+assigns this parameter when the frame is created; changing the
+parameter has no effect on the actual ID number.
+
+     <p><a name="index-outer_002dwindow_002did_0040r_007b_002c-a-frame-parameter_007d-3119"></a><br><dt><code>outer-window-id</code><dd>The ID number of the outermost window-system window in which the frame
+exists.  As with <code>window-id</code>, changing this parameter has no
+actual effect.
+
+     <p><a name="index-wait_002dfor_002dwm_0040r_007b_002c-a-frame-parameter_007d-3120"></a><br><dt><code>wait-for-wm</code><dd>If non-<code>nil</code>, tell Xt to wait for the window manager to confirm
+geometry changes.  Some window managers, including versions of Fvwm2
+and KDE, fail to confirm, so Xt hangs.  Set this to <code>nil</code> to
+prevent hanging with those window managers.
+
+     <p><a name="index-sticky_0040r_007b_002c-a-frame-parameter_007d-3121"></a><br><dt><code>sticky</code><dd>If non-<code>nil</code>, the frame is visible on all virtual desktops on systems
+with virtual desktops.
+
+     <p><a name="index-inhibit_002ddouble_002dbuffering_0040r_007b_002c-a-frame-parameter_007d-3122"></a><br><dt><code>inhibit-double-buffering</code><dd>If non-<code>nil</code>, the frame is drawn to the screen without double
+buffering.  Emacs normally attempts to use double buffering, where
+available, to reduce flicker.  Set this property if you experience
+display bugs or pine for that retro, flicker-y feeling.
+
+     <p><a name="index-skip_002dtaskbar_0040r_007b_002c-a-frame-parameter_007d-3123"></a><br><dt><code>skip-taskbar</code><dd>If non-<code>nil</code>, this tells the window manager to remove the frame's
+icon from the taskbar associated with the frame's display and inhibit
+switching to the frame's window via the combination <kbd>Alt-&lt;TAB&gt;</kbd>. 
+On MS-Windows, iconifying such a frame will "roll in" its window-system
+window at the bottom of the desktop.  Some window managers may not honor
+this parameter.
+
+     <p><a name="index-no_002dfocus_002don_002dmap_0040r_007b_002c-a-frame-parameter_007d-3124"></a><br><dt><code>no-focus-on-map</code><dd>If non-<code>nil</code>, this means that the frame does not want to receive
+input focus when it is mapped (see <a href="Visibility-of-Frames.html#Visibility-of-Frames">Visibility of Frames</a>).  Some
+window managers may not honor this parameter.
+
+     <p><a name="index-no_002daccept_002dfocus_0040r_007b_002c-a-frame-parameter_007d-3125"></a><br><dt><code>no-accept-focus</code><dd>If non-<code>nil</code>, this means that the frame does not want to receive
+input focus via explicit mouse clicks or when moving the mouse into it
+either via <code>focus-follows-mouse</code> (see <a href="Input-Focus.html#Input-Focus">Input Focus</a>) or
+<code>mouse-autoselect-window</code> (see <a href="Mouse-Window-Auto_002dselection.html#Mouse-Window-Auto_002dselection">Mouse Window Auto-selection</a>). 
+This may have the unwanted side-effect that a user cannot scroll a
+non-selected frame with the mouse.  Some window managers may not honor
+this parameter.
+
+     <p><a name="index-undecorated_0040r_007b_002c-a-frame-parameter_007d-3126"></a><br><dt><code>undecorated</code><dd>If non-<code>nil</code>, this frame's window-system window is drawn without
+decorations, like the title, minimize/maximize boxes and external
+borders.  This usually means that the window cannot be dragged, resized,
+iconified, maximized or deleted with the mouse.  If <code>nil</code>, the frame's
+window is usually drawn with all the elements listed above unless their
+display has been suspended via window manager settings.
+
+     <p>Under X, Emacs uses the Motif window manager hints to turn off
+decorations.  Some window managers may not honor these hints.
+
+     <p>NS builds consider the tool bar to be a decoration, and therefore hide
+it on an undecorated frame.
+
+     <p><a name="index-override_002dredirect_0040r_007b_002c-a-frame-parameter_007d-3127"></a><br><dt><code>override-redirect</code><dd><a name="index-override-redirect-frames-3128"></a>If non-<code>nil</code>, this means that this is an <dfn>override redirect</dfn>
+frame&mdash;a frame not handled by window managers under X.  Override
+redirect frames have no window manager decorations, can be positioned
+and resized only via Emacs' positioning and resizing functions and are
+usually drawn on top of all other frames.  Setting this parameter has
+no effect on MS-Windows.
+
+     <p><a name="index-ns_002dappearance_0040r_007b_002c-a-frame-parameter_007d-3129"></a><br><dt><code>ns-appearance</code><dd>Only available on macOS, if set to <code>dark</code> draw this frame's
+window-system window using the &ldquo;vibrant dark&rdquo; theme, otherwise use
+the system default.  The &ldquo;vibrant dark&rdquo; theme can be used to set the
+toolbar and scrollbars to a dark appearance when using an Emacs theme
+with a dark background.
+
+     <p><a name="index-ns_002dtransparent_002dtitlebar_0040r_007b_002c-a-frame-parameter_007d-3130"></a><br><dt><code>ns-transparent-titlebar</code><dd>Only available on macOS, if non-<code>nil</code>, set the titlebar and
+toolbar to be transparent.  This effectively sets the background color
+of both to match the Emacs background color. 
+</dl>
+
+   </body></html>
+

@@ -1,0 +1,138 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link rev="made" href="mailto:bug-gnu-emacs@gnu.org">
+<link rel="icon" type="image/png" href="/graphics/gnu-head-mini.png">
+<meta name="ICBM" content="42.256233,-71.006581">
+<meta name="DC.title" content="gnu.org">
+
+<title>Window Hooks</title>
+<!--
+This is the `GNU Emacs Lisp Reference Manual'
+corresponding to Emacs version 26.1.
+
+Copyright (C) 1990--1996, 1998--2018 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with the Invariant Sections being ``GNU General Public
+     License,'' with the Front-Cover Texts being ``A GNU Manual,'' and
+     with the Back-Cover Texts as in (a) below.  A copy of the license
+     is included in the section entitled ``GNU Free Documentation
+     License.''
+
+     (a) The FSF's Back-Cover Text is: ``You have the freedom to copy
+     and modify this GNU manual.  Buying copies from the FSF supports
+     it in developing GNU and promoting software freedom.''
+   -->
+<style type="text/css">
+@import url('/software/emacs/manual.css');
+</style>
+</head>
+<body>
+<div class="node" style="background-color:#DDDDFF">
+<a name="Window-Hooks"></a>
+<p>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="Window-Parameters.html#Window-Parameters">Window Parameters</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="Windows.html#Windows">Windows</a>
+
+</p></div>
+
+<h3 class="section">28.30 Hooks for Window Scrolling and Changes</h3>
+
+<p><a name="index-hooks-for-window-operations-2902"></a>
+This section describes how a Lisp program can take action whenever a
+window displays a different part of its buffer or a different buffer. 
+There are three actions that can change this: scrolling the window,
+switching buffers in the window, and changing the size of the window. 
+The first two actions run <code>window-scroll-functions</code>; the last runs
+<code>window-size-change-functions</code>.
+
+</p><div class="defun">
+— Variable: <a class="dashAnchor" name="//apple_ref/Variable/window%2Dscroll%2Dfunctions"></a><b>window-scroll-functions</b><var><a name="index-window_002dscroll_002dfunctions-2903"></a></var><br>
+<blockquote><p>This variable holds a list of functions that Emacs should call before
+redisplaying a window with scrolling.  Displaying a different buffer in
+the window also runs these functions.
+
+        </p><p>This variable is not a normal hook, because each function is called with
+two arguments: the window, and its new display-start position.  At the
+time of the call, the display-start position of the window argument is
+already set to its new value, and the buffer to be displayed in the
+window is already set as the current buffer.
+
+        </p><p>These functions must take care when using <code>window-end</code>
+(see <a href="Window-Start-and-End.html#Window-Start-and-End">Window Start and End</a>); if you need an up-to-date value, you
+must use the <var>update</var> argument to ensure you get it.
+
+        </p><p><strong>Warning:</strong> don't use this feature to alter the way the window
+is scrolled.  It's not designed for that, and such use probably won't
+work. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/run%2Dwindow%2Dscroll%2Dfunctions"></a><b>run-window-scroll-functions</b><var> &amp;optional window<a name="index-run_002dwindow_002dscroll_002dfunctions-2904"></a></var><br>
+<blockquote><p>This function calls <code>window-scroll-functions</code> for the specified
+<var>window</var>, which defaults to the selected window. 
+</p></blockquote></div>
+
+<div class="defun">
+— Variable: <a class="dashAnchor" name="//apple_ref/Variable/window%2Dsize%2Dchange%2Dfunctions"></a><b>window-size-change-functions</b><var><a name="index-window_002dsize_002dchange_002dfunctions-2905"></a></var><br>
+<blockquote><p>This variable holds a list of functions to be called if the size of any
+window changes for any reason.  The functions are called once per
+redisplay, and once for each frame on which size changes have occurred.
+
+        </p><p>Each function receives the frame as its sole argument.  To find out
+whether a specific window has changed size, compare the return values of
+<code>window-pixel-width-before-size-change</code> and
+<code>window-pixel-width</code> respectively
+<code>window-pixel-height-before-size-change</code> and
+<code>window-pixel-height</code> for that window (see <a href="Window-Sizes.html#Window-Sizes">Window Sizes</a>).
+
+        </p><p>These function are usually only called when at least one window was
+added or has changed size since the last time this hook was run for the
+associated frame.  In some rare cases this hook also runs when a window
+that was added intermittently has been deleted afterwards.  In these
+cases none of the windows on the frame will appear to have changed its
+size.
+
+        </p><p>You may use <code>save-selected-window</code> in these functions
+(see <a href="Selecting-Windows.html#Selecting-Windows">Selecting Windows</a>).  However, do not use
+<code>save-window-excursion</code> (see <a href="Window-Configurations.html#Window-Configurations">Window Configurations</a>); exiting
+that macro counts as a size change, which would cause these functions to
+be called again. 
+</p></blockquote></div>
+
+<div class="defun">
+— Variable: <a class="dashAnchor" name="//apple_ref/Variable/window%2Dconfiguration%2Dchange%2Dhook"></a><b>window-configuration-change-hook</b><var><a name="index-window_002dconfiguration_002dchange_002dhook-2906"></a></var><br>
+<blockquote><p>A normal hook that is run every time the window configuration of a frame
+changes.  Window configuration changes include splitting and deleting
+windows, and the display of a different buffer in a window.  Resizing the
+frame or individual windows do not count as configuration changes.  Use
+<code>window-size-change-functions</code>, see above, when you want to track
+size changes that are not caused by the deletion or creation of windows.
+
+        </p><p>The buffer-local value of this hook is run once for each window on the
+affected frame, with the relevant window selected and its buffer
+current.  The global value of this hook is run once for the modified
+frame, with that frame selected. 
+</p></blockquote></div>
+
+<div class="defun">
+— Function: <a class="dashAnchor" name="//apple_ref/Function/run%2Dwindow%2Dconfiguration%2Dchange%2Dhook"></a><b>run-window-configuration-change-hook</b><var> &amp;optional frame<a name="index-run_002dwindow_002dconfiguration_002dchange_002dhook-2907"></a></var><br>
+<blockquote><p>This function runs <code>window-configuration-change-hook</code> for the
+specified <var>frame</var>, which defaults to the selected frame. 
+</p></blockquote></div>
+
+   <p>In addition, you can use <code>jit-lock-register</code> to register a Font
+Lock fontification function, which will be called whenever parts of a
+buffer are (re)fontified because a window was scrolled or its size
+changed.  See <a href="Other-Font-Lock-Variables.html#Other-Font-Lock-Variables">Other Font Lock Variables</a>. 
+<!-- *-texinfo-*- -->
+<!-- This is part of the GNU Emacs Lisp Reference Manual. -->
+<!-- Copyright (C) 1990-1995, 1998-1999, 2001-2018 Free Software -->
+<!-- Foundation, Inc. -->
+<!-- See the file elisp.texi for copying conditions. -->
+
+   
+
+</p></body></html>
